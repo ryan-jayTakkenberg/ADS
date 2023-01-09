@@ -17,6 +17,10 @@ Thumbs.db
 **/.vscode/
 *.code-workspace
 
+# data files excluded from git
+**/data-files/
+**/downloads/
+
 # Log file
 *.log
 
