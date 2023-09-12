@@ -1,11 +1,12 @@
 package models;
 
-public class Wagon {
+public abstract class Wagon {
     public int id;               // some unique ID of a Wagon
-    private Wagon nextWagon;        // another wagon that is appended at the tail of this wagon
+    private Wagon nextWagon;
+                                 // another wagon that is appended at the tail of this wagon
                                     // a.k.a. the successor of this wagon in a sequence
                                     // set to null if no successor is connected
-    private Wagon previousWagon;    // another wagon that is prepended at the front of this wagon
+    private Wagon previousWagon; // another wagon that is prepended at the front of this wagon
                                     // a.k.a. the predecessor of this wagon in a sequence
                                     // set to null if no predecessor is connected
 
@@ -34,18 +35,14 @@ public class Wagon {
      * @return  whether this wagon has a wagon appended at the tail
      */
     public boolean hasNextWagon() {
-        // TODO
-
-        return false;
+        return nextWagon != null;
     }
 
     /**
      * @return  whether this wagon has a wagon prepended at the front
      */
     public boolean hasPreviousWagon() {
-        // TODO
-
-        return false;
+        return previousWagon!= null;
     }
 
     /**
@@ -54,9 +51,14 @@ public class Wagon {
      * @return  the last wagon
      */
     public Wagon getLastWagonAttached() {
-        // TODO find the last wagon in the sequence
+        Wagon currentWagon = this;// zorgt voor de trein die we pakken steeds vernieuwd naar de gene die we hebben aangevinkt */
 
-        return null;
+        while(currentWagon.hasNextWagon()){ // blijft lopen totdat we bij de laatste zijn
+            currentWagon = currentWagon.getNextWagon();//als er nog eentje achter is update hij totdat we bij de laatste zijn
+        }
+            return currentWagon; // en als we de laatste hebben stopt de while en pakken we de laatst e
+
+
     }
 
     /**
@@ -64,9 +66,18 @@ public class Wagon {
      * including this wagon itself.
      */
     public int getSequenceLength() {
-        // TODO traverse the sequence and find its length
+        int sum = 0;
+        Wagon currentWagon = this;
 
-        return 0;
+        while (currentWagon.hasNextWagon()){
+           if(currentWagon instanceof  FreightWagon) {
+               sum++;
+           }
+            currentWagon = currentWagon.getNextWagon();
+
+        }
+
+        return sum;
     }
 
     /**
@@ -82,6 +93,17 @@ public class Wagon {
      */
     public void attachTail(Wagon tail) {
         // TODO verify the exceptions
+        Wagon currentWagon = this;
+
+        if (currentWagon.hasPreviousWagon()) {// als de huidige wagon een voorganger heeft krijg je een error
+            throw new IllegalStateException(String.format("%s is already pulling %s", currentWagon, tail));
+        }else if (tail.hasNextWagon()){// als de tail al een voorganger heeft ook error
+            throw new IllegalStateException(String.format("%s has already been attached to %s", currentWagon, tail));
+        } else {// als het beide niety zo is dan wordt de tail toegevoeg aan de voortganger
+            this.setNextWagon(tail);
+            tail.setPreviousWagon(this);
+        }
+
 
         // TODO attach the tail wagon to this wagon (sustaining the invariant propositions).
     }
@@ -147,4 +169,13 @@ public class Wagon {
     }
 
     // TODO string representation of a Wagon
+
+
+    public void setNextWagon(Wagon nextWagon) {
+        this.nextWagon = nextWagon;
+    }
+
+    public void setPreviousWagon(Wagon previousWagon) {
+        this.previousWagon = previousWagon;
+    }
 }
