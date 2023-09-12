@@ -111,9 +111,17 @@ public class Train {
      *
      */
     public int getTotalMaxWeight() {
-        // TODO
+        int weightCounter = 0;
+        Wagon currentWagon = this.firstWagon; // Start with the first wagon
 
-        return 0;   // replace by proper outcome
+        while (currentWagon != null) {
+            if (currentWagon instanceof PassengerWagon) { // Check if it's a passenger wagon
+                weightCounter += ((FreightWagon) currentWagon).getMaxWeight();
+            }
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+        }
+
+        return weightCounter;
     }
 
      /**
