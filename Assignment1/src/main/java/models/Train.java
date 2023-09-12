@@ -91,20 +91,17 @@ public class Train {
      *          (return 0 for a freight train)
      */
     public int getTotalNumberOfSeats() {
-        // TODO
-//        int passengerSeats = 0;
-//
-//        if (this.isPassengerTrain()) { // Check if passenger train
-//            for (int i = 0; i < ((PassengerWagon) this.firstWagon).getNumberOfSeats(); i++) {
-//
-//            }
-//        }
-//
-//        return passengerSeats;   // replace by proper outcome
+        int passengerSeats = 0;
+        Wagon currentWagon = this.firstWagon; // Start with the first wagon
 
-        // Try using a foreach loop instead of a normal loop
+        while (currentWagon != null) {
+            if (currentWagon instanceof PassengerWagon) { // Check if it's a passenger wagon
+                passengerSeats += ((PassengerWagon) currentWagon).getNumberOfSeats();
+            }
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+        }
 
-        return 0;
+        return passengerSeats;
     }
 
     /**
