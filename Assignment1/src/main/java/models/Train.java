@@ -23,8 +23,7 @@ public class Train {
      */
     public boolean hasWagons() {
         // TODO
-
-        return false;   // replace by proper outcome
+        return this.firstWagon != null; // replace by proper outcome
     }
 
     /**
@@ -34,8 +33,7 @@ public class Train {
      */
     public boolean isPassengerTrain() {
         // TODO
-
-        return false;   // replace by proper outcome
+        return this.firstWagon instanceof PassengerWagon;
     }
 
     /**
@@ -45,8 +43,7 @@ public class Train {
      */
     public boolean isFreightTrain() {
         // TODO
-
-        return false;   // replace by proper outcome
+        return this.firstWagon instanceof FreightWagon;
     }
 
     public Locomotive getEngine() {
@@ -71,8 +68,13 @@ public class Train {
      */
     public int getNumberOfWagons() {
         // TODO
+        int wagonCount = 0; // Wagon counter
 
-        return 0;   // replace by proper outcome
+        for (int i = 0; i < this.engine.getMaxWagons(); i++) { // Check max wagons attached to locomotive
+            wagonCount++;
+        }
+
+        return wagonCount;
     }
 
     /**
@@ -90,8 +92,19 @@ public class Train {
      */
     public int getTotalNumberOfSeats() {
         // TODO
+//        int passengerSeats = 0;
+//
+//        if (this.isPassengerTrain()) { // Check if passenger train
+//            for (int i = 0; i < ((PassengerWagon) this.firstWagon).getNumberOfSeats(); i++) {
+//
+//            }
+//        }
+//
+//        return passengerSeats;   // replace by proper outcome
 
-        return 0;   // replace by proper outcome
+        // Try using a foreach loop instead of a normal loop
+
+        return 0;
     }
 
     /**
