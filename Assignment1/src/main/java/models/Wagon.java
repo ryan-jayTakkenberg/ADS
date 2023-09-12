@@ -109,13 +109,31 @@ public abstract class Wagon {
     }
 
     /**
-     * Detaches the tail from this wagon and returns the first wagon of this tail.
+     * Detaches the tail from this wagon and  * Detaches this wagon from the wagon in front of it.
+     * No action if this wagon has no previous wagon attached.
+     * @return  the former previousWagon that has been detached from,
+     *          or <code>null</code> if it had no previousWagon. returns the first wagon of this tail.
      * @return the first wagon of the tail that has been detached
      *          or <code>null</code> if it had no wagons attached to its tail.
      */
     public Wagon detachTail() {
         // TODO detach the tail from this wagon (sustaining the invariant propositions).
         //  and return the head wagon of that tail
+
+
+        if (this.nextWagon != null){
+            Wagon headOfTail = this.nextWagon;//kijken wat de staart is
+            this.nextWagon = null; //loskoppelen
+
+            if (headOfTail.previousWagon != null){ // checken of hij een vorige heeft
+                headOfTail.getPreviousWagon().nextWagon = null;// zo ja loskoppelen
+                headOfTail.setPreviousWagon(null);
+            }
+            return headOfTail;
+
+
+        }
+
 
         return null;
     }
@@ -130,7 +148,23 @@ public abstract class Wagon {
         // TODO detach this wagon from its predecessor (sustaining the invariant propositions).
         //   and return that predecessor
 
+        if (this.previousWagon != null){
+            Wagon frontOfTail;
+            frontOfTail = null;
+            if (frontOfTail.previousWagon != null){ // checken of hij een vorige heeft
+                frontOfTail.getNextWagon().nextWagon = null;// zo ja loskoppelen
+                frontOfTail.setNextWagon(null);
+            }
+            return frontOfTail;
+
+
+        }
+
+
         return null;
+
+
+
     }
 
     /**
@@ -142,6 +176,9 @@ public abstract class Wagon {
      */
     public void reAttachTo(Wagon front) {
         // TODO detach any existing connections that will be rearranged
+
+
+
 
         // TODO attach this wagon to its new predecessor front (sustaining the invariant propositions).
     }
