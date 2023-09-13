@@ -11,4 +11,7 @@ public class PassengerWagon extends Wagon {
     public int getNumberOfSeats() {
         return numberOfSeats;
     }
+    public String toString(){
+        return "[Wagon-" + super.id +"]";
+    }
 }

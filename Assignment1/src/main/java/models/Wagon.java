@@ -66,7 +66,7 @@ public abstract class Wagon {
      * including this wagon itself.
      */
     public int getSequenceLength() {
-        int sum = 0;
+        int sum = 1;
         Wagon currentWagon = this;
 
         while (currentWagon.hasNextWagon()){
@@ -175,7 +175,16 @@ public abstract class Wagon {
      * @param front the wagon to which this wagon must be attached to.
      */
     public void reAttachTo(Wagon front) {
-        // TODO detach any existing connections that will be rearranged
+        // TODO detach any existing connections that will be rearrange
+
+        Wagon previous = detachFront(); // voorkant eraf gehaald
+        Wagon tail = front.detachTail(); //huide achterkant wordt eraf gehaald
+
+        tail.attachTail(this);
+        if (previous != null){
+            tail.attachTail(null);
+        }
+
 
 
 
@@ -188,6 +197,7 @@ public abstract class Wagon {
      * and reconnects its tail to the wagon in front of it, if any.
      */
     public void removeFromSequence() {
+
         // TODO
     }
 

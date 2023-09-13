@@ -11,4 +11,8 @@ public class FreightWagon extends Wagon{
     public int getMaxWeight() {
         return maxWeight;
     }
+
+    public String toString(){
+        return "[Wagon-" + super.id +"]";
+    }
 }
