@@ -81,9 +81,7 @@ public class Train {
      * @return  the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
-        // TODO
-
-        return null;    // replace by proper outcome
+        return this.firstWagon.getLastWagonAttached();
     }
 
     /**
@@ -130,11 +128,23 @@ public class Train {
      * @return  the wagon found at the given position
      *          (return null if the position is not valid for this train)
      */
-    public Wagon findWagonAtPosition(int position) {
-        // TODO
+     public Wagon findWagonAtPosition(int position) {
+         int index = 0; // Starting index pos
+         Wagon currentWagon = this.firstWagon; // Start with the first wagon
 
-        return null;    // replace by proper outcome
-    }
+         while (currentWagon != null) {
+             if (currentWagon instanceof PassengerWagon) { // Check if it's a passenger wagon
+                 if (index == position) {
+                     return currentWagon; // Found the wagon at the desired position
+                 }
+                 index++;
+             }
+             currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+         }
+
+         // If the loop completes without finding the desired position
+         return null;
+     }
 
     /**
      * Finds the wagon with a given wagonId
@@ -143,24 +153,56 @@ public class Train {
      *          (return null if no wagon was found with the given wagonId)
      */
     public Wagon findWagonById(int wagonId) {
-        // TODO
+        int index = 0; // Starting index pos
+        Wagon currentWagon = this.firstWagon; // Start with the first wagon
 
-        return null;    // replace by proper outcome
+        while (currentWagon != null) {
+            if (currentWagon instanceof PassengerWagon) { // Check if it's a passenger wagon
+                if (index == wagonId) {
+                    return currentWagon; // Found the wagon at the desired position
+                }
+                index++;
+            }
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+        }
+
+        // If the loop completes without finding the desired position
+        return null;
     }
 
     /**
-     * Determines if the given sequence of wagons can be attached to this train
-     * Verifies if the type of wagons match the type of train (Passenger or Freight)
-     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
-     * Verifies that the wagon is not part of the train already
-     * Ignores the predecessors before the head wagon, if any
+     * Determines if the given sequence of wagons can be attached to this train [x]
+     * Verifies if the type of wagons match the type of train (Passenger or Freight) [x]
+     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons [x]
+     * Verifies that the wagon is not part of the train already [x]
+     * Ignores the predecessors before the head wagon, if any [x]
      * @param wagon the head wagon of a sequence of wagons to consider for attachment
      * @return whether type and capacity of this train can accommodate attachment of the sequence
      */
     public boolean canAttach(Wagon wagon) {
-        // TODO
+        int currentTotalWagons = 0; // Calculate how many wagons are currently attached to train
+        int currentWagonId; // Track current ID of wagon
 
-        return false;   // replace by proper outcome
+        Wagon currentWagon = this.firstWagon;
+        currentWagonId = currentWagon.getId(); // Assign current wagon ID to value
+
+        while (currentWagon != null && wagon.id != currentWagonId) { // If wagon id doesn't exist yet
+            currentTotalWagons++;
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+
+            if (currentWagon == null) {
+                if (wagon instanceof PassengerWagon || wagon instanceof FreightWagon) { // Check if it's a passenger/freight wagon
+                    if (currentTotalWagons < this.engine.getMaxWagons()) {
+                        return true;
+                    }
+                } else {
+                    return false; // Don't add wagon if not instance of passenger/freight
+                }
+            }
+        }
+
+        // Return false if wagon was already attached to train
+        return false;
     }
 
     /**
