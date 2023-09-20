@@ -339,9 +339,12 @@ public class Train {
         currentWagon.detachTail(); // Remove their predecessor wagon
         currentWagon.detachFront(); // Remove their next wagon
 
-        toTrain.attachToRear(currentWagon); // Attach wagon to rear of new train
+        if (toTrain.canAttach(currentWagon)) {
+            toTrain.attachToRear(currentWagon); // Attach wagon to rear of new train
+            return true;
+        }
 
-        return true;   // replace by proper outcome
+        return false;   // If wagon was unable to be attached to train
      }
 
     /**
@@ -356,9 +359,22 @@ public class Train {
      * @return  whether the move could be completed successfully
      */
     public boolean splitAtPosition(int position, Train toTrain) {
-        // TODO
+        Wagon currentWagon = this.firstWagon;
+        int currentTotalWagons = 0;
 
-        return false;   // replace by proper outcome
+        while(currentTotalWagons != position) {
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+            currentTotalWagons++;
+        }
+
+        if (currentTotalWagons < this.engine.getMaxWagons()) {
+            currentWagon.setPreviousWagon(null);
+            toTrain.attachToRear(currentWagon);
+            return true;
+
+        }
+        // Return false if wagon was unable to be split from train
+        return false;
     }
 
     /**
@@ -369,8 +385,23 @@ public class Train {
      * (No change if the train has no wagons or only one wagon)
      */
     public void reverse() {
-        // TODO
+        if (this.firstWagon == null || this.firstWagon.getNextWagon() == null) {   // No change needed for 0 or 1 wagons
+            return;
+        }
 
+        Wagon prevWagon = null;
+        Wagon currentWagon = firstWagon;
+        Wagon nextWagon;
+
+        while (currentWagon != null) {
+            nextWagon = currentWagon.getNextWagon();
+            currentWagon.setNextWagon(prevWagon);
+            prevWagon = currentWagon;
+            currentWagon = nextWagon;
+        }
+
+        // Update the firstWagon reference to point to the new first wagon
+        this.firstWagon = prevWagon;
     }
 
     // TODO string representation of a train
