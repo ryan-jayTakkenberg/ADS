@@ -348,12 +348,15 @@ public class Train {
     public String toString() {
         String wagonsDisplayed = "";
         Wagon currentWagon = this.firstWagon;
+        int wagonCounter = 0;
 
         while(currentWagon != null) {
             wagonsDisplayed += currentWagon;
             currentWagon = currentWagon.getNextWagon();
+            wagonCounter++;
         }
 
-        return "[Loc-" + this.engine.getLocNumber() + "]" + wagonsDisplayed;
+        return "[Loc-" + this.engine.getLocNumber() + "]" + wagonsDisplayed + " with "
+                + wagonCounter + " wagons from " + this.origin + " to " + this.destination;
     }
 }
