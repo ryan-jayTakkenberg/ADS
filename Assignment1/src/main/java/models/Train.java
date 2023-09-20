@@ -42,7 +42,6 @@ public class Train {
      * @return
      */
     public boolean isFreightTrain() {
-        // TODO
         return this.firstWagon instanceof FreightWagon;
     }
 
@@ -60,7 +59,7 @@ public class Train {
      * @param wagon the first wagon of a sequence of wagons to be attached (can be null)
      */
     public void setFirstWagon(Wagon wagon) {
-        // TODO
+        this.firstWagon = wagon;
     }
 
     /**
@@ -81,7 +80,14 @@ public class Train {
      * @return  the last wagon attached to the train
      */
     public Wagon getLastWagonAttached() {
-        return this.firstWagon.getLastWagonAttached();
+        Wagon currentWagon = this.firstWagon;
+
+        while(currentWagon.hasNextWagon()) {
+            currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+        }
+
+        // Reached the end of wagons
+        return currentWagon;
     }
 
     /**
@@ -214,24 +220,60 @@ public class Train {
      * @return  whether the attachment could be completed successfully
      */
     public boolean attachToRear(Wagon wagon) {
-        // TODO
+        int currentTotalWagons = 0;
 
-        return false;   // replace by proper outcome
+        if (this.firstWagon == null) {
+            this.firstWagon = wagon;
+        } else {
+            if (currentTotalWagons < this.engine.getMaxWagons()) {
+                Wagon currentWagon = this.firstWagon;
+
+                while(currentWagon.hasNextWagon()) {
+                    currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+                    currentTotalWagons++;
+                }
+
+                currentWagon.setNextWagon(wagon);
+            }
+        }
+
+        // Return false if wagon was unable to be attached to train
+        return false;
     }
 
     /**
      * Tries to insert the given sequence of wagons at the front of the train
      * (the front is at position one, before the current first wagon, if any)
      * No change is made if the insertion cannot be made.
-     * (when the sequence is not compatible or the engine has insufficient capacity)
+     * (when the sequence is not compatible or the engine   insufficient capacity)
      * if insertion is possible, the head wagon is first detached from its predecessors, if any
      * @param wagon the head wagon of a sequence of wagons to be inserted
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtFront(Wagon wagon) {
-        // TODO
+        int currentTotalWagons = 0;
 
-        return false;   // replace by proper outcome
+        if (this.firstWagon == null) {
+            this.firstWagon = wagon;
+        } else {
+            if (currentTotalWagons < this.engine.getMaxWagons()) {
+                Wagon currentWagon = this.firstWagon;
+
+                while(currentWagon.hasPreviousWagon()) {
+                    currentWagon = currentWagon.getPreviousWagon(); // Move to the next wagon
+                    currentTotalWagons++;
+                }
+
+                currentWagon.setPreviousWagon(wagon);
+
+                if (currentTotalWagons == this.engine.getMaxWagons()) {
+                    this.firstWagon = currentWagon;
+                }
+            }
+        }
+
+        // Return false if wagon was unable to be attached to train
+        return false;
     }
 
     /**
@@ -301,4 +343,19 @@ public class Train {
     }
 
     // TODO string representation of a train
+
+    @Override
+    public String toString() {
+        String wagonsDisplayed = "";
+        Wagon currentWagon = this.firstWagon;
+
+        wagonsDisplayed = wagonsDisplayed + this.firstWagon.toString();
+
+        while(currentWagon != null) {
+            wagonsDisplayed += currentWagon;
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        return "[Loc-" + this.engine.getLocNumber() + "]" + wagonsDisplayed;
+    }
 }
