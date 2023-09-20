@@ -349,8 +349,6 @@ public class Train {
         String wagonsDisplayed = "";
         Wagon currentWagon = this.firstWagon;
 
-        wagonsDisplayed = wagonsDisplayed + this.firstWagon.toString();
-
         while(currentWagon != null) {
             wagonsDisplayed += currentWagon;
             currentWagon = currentWagon.getNextWagon();
