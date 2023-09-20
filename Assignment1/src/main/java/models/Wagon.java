@@ -173,13 +173,12 @@ public abstract class Wagon {
         if (this.getPreviousWagon() != null) {
             this.detachFront();
         }
-
-        // Disconnect the 'front' wagon from its current tail, if it has one
+        
         if (front.getNextWagon() != null) {
             front.detachTail();
         }
 
-        // Attach this wagon to the 'front' wagon
+
         front.attachTail(this);
 
         // TODO attach this wagon to its new predecessor front (sustaining the invariant propositions).
@@ -190,14 +189,14 @@ public abstract class Wagon {
      * and reconnects its tail to the wagon in front of it, if any.
      */
     public void removeFromSequence() {
-        if (hasPreviousWagon()) {
-            Wagon previousWagon = this.previousWagon; // Store a reference to the previous wagon
-            previousWagon.detachTail(); // Detach this wagon from the previous wagon
+        if (hasPreviousWagon()) {// kijken of hij een vorige heegt en anders door gaan mer de loop
+            Wagon previousWagon = this.previousWagon;
+            previousWagon.detachTail(); // hier de vorige wagon van de achterkant wegghalen
 
-            if (hasNextWagon()) {
+            if (hasNextWagon()) {// kijken of hij een volgende heeft
                 Wagon tail = this.getNextWagon();
-                tail.detachFront();
-                previousWagon.attachTail(tail); // Attach the tail to the previous wagon
+                tail.detachFront();// hier de volgende weghalen
+                previousWagon.attachTail(tail); // en toevoegen aan de voor kant
             }
         } else if (hasNextWagon()) {
             Wagon nextWagon = this.getNextWagon();
@@ -217,11 +216,31 @@ public abstract class Wagon {
      * @return the new start Wagon of the reversed sequence (with is the former last Wagon of the original sequence)
      */
     public Wagon reverseSequence() {
-        // TODO provide an iterative implementation,
-        //   using attach- and detach methods of this class
+        Wagon reversedSequence = this.getLastWagonAttached();// hier pakt hij de laatste wagon
 
-        return null;
+        Wagon newTail = reversedSequence;// hier slaat ie die op in een eigen variable
+
+        while (reversedSequence.hasPreviousWagon()) {// dit is een loop van begin tot einde zodatals er geen is hij stopt
+            Wagon tempPrevious = reversedSequence.previousWagon;// hier pakt hij de vorige wagon en doet hem apart
+            tempPrevious.removeFromSequence();// bij deze haalt hij denwagon uit de sequence
+            newTail.attachTail(tempPrevious);// en bij deze zet hij die uitgehaald aan de achter kant van de laatste
+            // het is zo  A-B-C-D      dan wordt het A-B             D-C
+            newTail = tempPrevious;// en hier de voirge zodat hij door loopt
+
+            if (tempPrevious == this) {
+                break;
+            }
+        }
+
+        return reversedSequence;
     }
+
+
+
+
+
+
+
 
     // TODO string representation of a Wagon
 
