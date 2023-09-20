@@ -259,8 +259,12 @@ public class Train {
             if (currentTotalWagons < this.engine.getMaxWagons()) {
                 Wagon currentWagon = this.firstWagon;
 
+                if (wagon.hasPreviousWagon()) {     // Remove predecessors
+                    wagon.setPreviousWagon(null);
+                }
+
                 while(currentWagon.hasPreviousWagon()) {
-                    currentWagon = currentWagon.getPreviousWagon(); // Move to the next wagon
+                    currentWagon = currentWagon.getPreviousWagon();     // Move to the next wagon
                     currentTotalWagons++;
                 }
 
@@ -291,9 +295,27 @@ public class Train {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtPosition(int position, Wagon wagon) {
-        // TODO
+        if (this.firstWagon == null) {
+            this.firstWagon = wagon;
+        } else {
+            Wagon currentWagon = this.firstWagon;
+            int currentTotalWagons = 0;
 
-        return false;   // replace by proper outcome
+            if (wagon.hasPreviousWagon()) {
+                wagon.setPreviousWagon(null); // Remove predecessors
+            }
+
+            while(currentTotalWagons != position) {
+                currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
+                currentTotalWagons++;
+            }
+
+            wagon.setNextWagon(currentWagon.getNextWagon()); // Assign nextWagon to wagon param
+            currentWagon.setNextWagon(wagon); // Assign wagon param as nextWagon to currentWagon
+        }
+
+        // Return false if wagon was unable to be attached to train
+        return false;
     }
 
     /**
@@ -308,9 +330,18 @@ public class Train {
      * @return  whether the move could be completed successfully
      */
     public boolean moveOneWagon(int wagonId, Train toTrain) {
-        // TODO
+        Wagon currentWagon = this.firstWagon;
 
-        return false;   // replace by proper outcome
+        while(currentWagon.getId() != wagonId) {
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        currentWagon.detachTail(); // Remove their predecessor wagon
+        currentWagon.detachFront(); // Remove their next wagon
+
+        toTrain.attachToRear(currentWagon); // Attach wagon to rear of new train
+
+        return true;   // replace by proper outcome
      }
 
     /**
