@@ -450,7 +450,16 @@ public class Train {
      */
     public boolean splitAtPosition(int position, Train toTrain) {
         // Check if position is valid for this train
-        if (position < 0 || position >= this.engine.getMaxWagons() || toTrain == this) {
+        if (position < 0 || position >= this.engine.getMaxWagons()) {
+            return false;
+        }
+
+        // Unable to add different type of wagons to each other
+        if (this.firstWagon instanceof PassengerWagon && toTrain.getFirstWagon() instanceof FreightWagon) {
+            return false;
+        }
+
+        if (this.firstWagon instanceof FreightWagon && toTrain.getFirstWagon() instanceof PassengerWagon) {
             return false;
         }
 
