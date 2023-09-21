@@ -345,6 +345,7 @@ public class Train {
         if (sum <= this.getEngine().getMaxWagons()) {
             currentWagon.setPreviousWagon(wagon.getLastWagonAttached()); // Set new wagon head as previous wagon
             wagon.getLastWagonAttached().setNextWagon(currentWagon); // Attach current wagons to new wagon sequence
+            wagon.setPreviousWagon(null); // First wagon can't have previous wagons
             this.firstWagon = wagon; // Push new wagon to front
             return true;
         }
@@ -456,6 +457,7 @@ public class Train {
             } else {
                 currentWagon.getNextWagon().setPreviousWagon(null);
                 this.firstWagon = currentWagon.getNextWagon();
+                this.firstWagon.setPreviousWagon(null);
             }
         }
 
@@ -553,7 +555,7 @@ public class Train {
         }
 
         Wagon prevWagon = null;
-        Wagon currentWagon = firstWagon;
+        Wagon currentWagon = this.firstWagon;
         Wagon nextWagon;
 
         while (currentWagon != null) {
@@ -563,8 +565,21 @@ public class Train {
             currentWagon = nextWagon;
         }
 
+
         // Update the firstWagon reference to point to the new first wagon
         this.firstWagon = prevWagon;
+        currentWagon = this.firstWagon;
+
+        // Reassign the new previousWagon values
+        while(currentWagon.hasNextWagon()) {
+            currentWagon.getNextWagon().setPreviousWagon(currentWagon);
+
+            currentWagon = currentWagon.getNextWagon();
+        }
+
+        if (this.firstWagon.hasPreviousWagon()) {
+            this.firstWagon.setPreviousWagon(null);
+        }
     }
 
     // TODO string representation of a train
