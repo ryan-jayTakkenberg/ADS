@@ -420,14 +420,47 @@ public class Train {
      * @return  whether the move could be completed successfully
      */
     public boolean moveOneWagon(int wagonId, Train toTrain) {
+
+        // Unable to add different type of wagons to each other
+        if (this.firstWagon instanceof PassengerWagon && toTrain.getFirstWagon() instanceof FreightWagon) {
+            return false;
+        }
+
+        if (this.firstWagon instanceof FreightWagon && toTrain.getFirstWagon() instanceof PassengerWagon) {
+            return false;
+        }
+
+        if (toTrain.getEngine().getMaxWagons() <= toTrain.getNumberOfWagons()) {
+            return false; // Insufficient engine capacity
+        }
+
+
         Wagon currentWagon = this.firstWagon;
 
         while(currentWagon.getId() != wagonId) {
             currentWagon = currentWagon.getNextWagon();
         }
 
-        currentWagon.detachTail(); // Remove their predecessor wagon
-        currentWagon.detachFront(); // Remove their next wagon
+        // Give old values to neighbour wagons (if any)
+        if (currentWagon.hasPreviousWagon()) {
+            if (currentWagon.hasNextWagon()) {
+                currentWagon.getPreviousWagon().setNextWagon(currentWagon.getNextWagon());
+            } else {
+                currentWagon.getPreviousWagon().setNextWagon(null);
+            }
+        }
+
+        if (currentWagon.hasNextWagon()) {
+            if (currentWagon.hasPreviousWagon()) {
+                currentWagon.getNextWagon().setPreviousWagon(currentWagon.getPreviousWagon());
+            } else {
+                currentWagon.getNextWagon().setPreviousWagon(null);
+                this.firstWagon = currentWagon.getNextWagon();
+            }
+        }
+
+        currentWagon.setPreviousWagon(null);
+        currentWagon.setNextWagon(null);
 
         if (toTrain.canAttach(currentWagon)) {
             toTrain.attachToRear(currentWagon); // Attach wagon to rear of new train
