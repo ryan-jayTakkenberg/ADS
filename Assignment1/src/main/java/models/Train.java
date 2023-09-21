@@ -274,6 +274,11 @@ public class Train {
     public boolean attachToRear(Wagon wagon) {
         int totalOfWagons = 0;
 
+        // Check if Wagon is part of train
+        if (isWagonInTrain(wagon)) {
+            return false; // Wagon is already part of the train
+        }
+
         // Detach the head wagon from its predecessors (if any)
         if (wagon.hasPreviousWagon()) {
             wagon.getPreviousWagon().setNextWagon(null);
@@ -286,11 +291,6 @@ public class Train {
         } else {
             Wagon currentWagon = this.firstWagon;
 
-            // Check if Wagon is part of train
-            if (isWagonInTrain(wagon)) {
-                return false; // Wagon is already part of the train
-            }
-
             while (currentWagon.getNextWagon() != null) {
                 currentWagon = currentWagon.getNextWagon();
                 totalOfWagons++;
@@ -298,6 +298,7 @@ public class Train {
 
             if (totalOfWagons < this.engine.getMaxWagons()) {
                 currentWagon.setNextWagon(wagon);
+                wagon.setPreviousWagon(currentWagon);
             }
         }
 
@@ -398,7 +399,7 @@ public class Train {
             }
             this.firstWagon = wagon;
         } else {
-            Wagon previousWagon = findWagonAtPosition(position - 1); // Find ther previous wagon
+            Wagon previousWagon = findWagonAtPosition(position - 1); // Find the previous wagon
             wagon.getLastWagonAttached().setNextWagon(previousWagon.getNextWagon()); // Assign next wagon to end of given wagon sequence
             wagon.setPreviousWagon(previousWagon);
             previousWagon.setNextWagon(wagon);
@@ -464,8 +465,21 @@ public class Train {
             currentPosition++;
         }
 
+        // Verify that the engine capacity is sufficient
+        int wagonsToAttach = countWagons(currentWagon);
+        int sum = toTrain.getNumberOfWagons() + wagonsToAttach;
+
+        if (sum > toTrain.getEngine().getMaxWagons()) {
+            return false; // Insufficient engine capacity
+        }
+
         if (currentWagon == null) {
             return false; // Invalid position
+        }
+
+        // Detach the head wagon from its predecessors (if any)
+        if (currentWagon.hasPreviousWagon()) {
+            currentWagon.setPreviousWagon(null);
         }
 
         // Disconnect the wagons before the split point
@@ -478,6 +492,7 @@ public class Train {
 
         // Move the split sequence to toTrain
         toTrain.attachToRear(currentWagon);
+
 
         return true; // Split and move successful
     }
