@@ -201,6 +201,24 @@ public class Train {
     }
 
     /**
+     * Counts the number of wagons in a sequence starting from the given wagon.
+     *
+     * @param wagon the head wagon of a sequence of wagons
+     * @return the number of wagons in the sequence
+     */
+    private int countWagons(Wagon wagon) {
+        int count = 0;
+        Wagon current = wagon;
+
+        while (current != null) {
+            count++;
+            current = current.getNextWagon();
+        }
+
+        return count;
+    }
+
+    /**
      * Determines if the given sequence of wagons can be attached to this train
      * Verifies if the type of wagons match the type of train (Passenger or Freight)
      * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
@@ -349,27 +367,44 @@ public class Train {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtPosition(int position, Wagon wagon) {
-        if (this.firstWagon == null) {
-            this.firstWagon = wagon;
-        } else {
-            Wagon currentWagon = this.firstWagon;
-            int currentTotalWagons = 0;
-
-            if (wagon.hasPreviousWagon()) {
-                wagon.setPreviousWagon(null); // Remove predecessors
-            }
-
-            while(currentTotalWagons != position) {
-                currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
-                currentTotalWagons++;
-            }
-
-            wagon.setNextWagon(currentWagon.getNextWagon()); // Assign nextWagon to wagon param
-            currentWagon.setNextWagon(wagon); // Assign wagon param as nextWagon to currentWagon
+        // Check if Wagon is part of train
+        if (isWagonInTrain(wagon)) {
+            return false; // Wagon is already part of the train
         }
 
-        // Return false if wagon was unable to be attached to train
-        return false;
+        // Verify that the engine capacity is sufficient
+        int wagonsToAttach = countWagons(wagon);
+
+        if (this.engine.getMaxWagons() < wagonsToAttach) {
+            return false; // Insufficient engine capacity
+        }
+
+        // Verify that the given position is valid for insertion
+        if (position < 0 || position > this.getNumberOfWagons()) {
+            return false; // Invalid position
+        }
+
+        // Detach the head wagon from its predecessors (if any)
+        if (wagon.getPreviousWagon() != null) {
+            wagon.getPreviousWagon().setNextWagon(null);
+            wagon.setPreviousWagon(null);
+        }
+
+        // Insert the sequence of wagons at the specified position
+        if (position == 0) {
+            if (this.firstWagon != null) {
+                wagon.setNextWagon(this.firstWagon);
+                this.firstWagon.setPreviousWagon(wagon);
+            }
+            this.firstWagon = wagon;
+        } else {
+            Wagon previousWagon = findWagonAtPosition(position - 1); // Find ther previous wagon
+            wagon.getLastWagonAttached().setNextWagon(previousWagon.getNextWagon()); // Assign next wagon to end of given wagon sequence
+            wagon.setPreviousWagon(previousWagon);
+            previousWagon.setNextWagon(wagon);
+        }
+
+        return true; // Insertion successful
     }
 
     /**
