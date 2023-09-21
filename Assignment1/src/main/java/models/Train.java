@@ -315,7 +315,7 @@ public class Train {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtFront(Wagon wagon) {
-        int totalWagonsToAttach = 0;
+        int wagonsToAttach = countWagons(wagon);
         Wagon trackTotalNewWagons = wagon;
 
         if (this.firstWagon == null) {
@@ -330,11 +330,10 @@ public class Train {
         Wagon currentWagon = this.firstWagon;
 
         while(trackTotalNewWagons != null) { // Calculate how many wagons need to be added
-            totalWagonsToAttach++;
             trackTotalNewWagons = trackTotalNewWagons.getNextWagon();
         }
 
-        int sum = this.getNumberOfWagons() + totalWagonsToAttach;
+        int sum = this.getNumberOfWagons() + wagonsToAttach;
 
         // Detach the head wagon from its predecessors (if any)
         if (wagon.hasPreviousWagon() && sum <= this.getEngine().getMaxWagons()) {
