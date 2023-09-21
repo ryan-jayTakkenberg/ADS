@@ -22,8 +22,7 @@ public class Train {
      * @return
      */
     public boolean hasWagons() {
-        // TODO
-        return this.firstWagon != null; // replace by proper outcome
+        return this.firstWagon != null; // If first wagon exists, train has wagons
     }
 
     /**
@@ -32,8 +31,7 @@ public class Train {
      * @return
      */
     public boolean isPassengerTrain() {
-        // TODO
-        return this.firstWagon instanceof PassengerWagon;
+        return this.firstWagon instanceof PassengerWagon; // Check whether firstWagon is a passenger wagon
     }
 
     /**
@@ -42,15 +40,15 @@ public class Train {
      * @return
      */
     public boolean isFreightTrain() {
-        return this.firstWagon instanceof FreightWagon;
+        return this.firstWagon instanceof FreightWagon; // Check whether first wagon is a freight wagon
     }
 
     public Locomotive getEngine() {
-        return engine;
+        return engine; // Return the engine of the train
     }
 
     public Wagon getFirstWagon() {
-        return firstWagon;
+        return firstWagon;   // Return the first wagon of the train
     }
 
     /**
@@ -205,33 +203,43 @@ public class Train {
     }
 
     /**
-     * Determines if the given sequence of wagons can be attached to this train [x]
-     * Verifies if the type of wagons match the type of train (Passenger or Freight) [x]
-     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons [x]
-     * Verifies that the wagon is not part of the train already [x]
-     * Ignores the predecessors before the head wagon, if any [x]
+     * Determines if the given sequence of wagons can be attached to this train
+     * Verifies if the type of wagons match the type of train (Passenger or Freight)
+     * Verifies that the capacity of the engine is sufficient to also pull the additional wagons
+     * Verifies that the wagon is not part of the train already
+     * Ignores the predecessors before the head wagon, if any
      * @param wagon the head wagon of a sequence of wagons to consider for attachment
      * @return whether type and capacity of this train can accommodate attachment of the sequence
      */
     public boolean canAttach(Wagon wagon) {
-        int countCurrentWagons = 0;
-
-        if (wagon.hasPreviousWagon()) { // Remove predecessors
-            wagon.setPreviousWagon(null);
-        }
+        int totalWagonsToAttach = 0;
 
         // Check if Wagon is part of train
         if (isWagonInTrain(wagon)) {
             return false; // Wagon is already part of the train
         }
 
-        // Don't attach more wagons than train capacity
-        if (this.getNumberOfWagons() < this.engine.getMaxWagons()) {
-            return true;
+        // Unable to add different type of wagons to each other
+        if (this.firstWagon instanceof PassengerWagon && wagon instanceof FreightWagon) {
+            return false;
         }
 
+        if (this.firstWagon instanceof FreightWagon && wagon instanceof PassengerWagon) {
+            return false;
+        }
 
-        if (wagon instanceof PassengerWagon || wagon instanceof FreightWagon) {
+        // Calculate how many wagons need to be attached
+        while(wagon != null) {
+            if (wagon instanceof PassengerWagon || wagon instanceof FreightWagon) {
+                totalWagonsToAttach++;
+                wagon = wagon.getNextWagon(); // loop till end
+            }
+        }
+
+        int sum = this.getNumberOfWagons() + totalWagonsToAttach;
+
+        // Don't attach more wagons than train capacity and instance of Passenger/Freight
+        if (sum <= this.engine.getMaxWagons()) {
             return true;
         }
 
@@ -251,7 +259,7 @@ public class Train {
         int totalOfWagons = 0;
 
         // Detach the head wagon from its predecessors (if any)
-        if (wagon.getPreviousWagon() != null) {
+        if (wagon.hasPreviousWagon()) {
             wagon.getPreviousWagon().setNextWagon(null);
             wagon.setPreviousWagon(null);
         }
@@ -261,6 +269,12 @@ public class Train {
             this.firstWagon = wagon;
         } else {
             Wagon currentWagon = this.firstWagon;
+
+            // Check if Wagon is part of train
+            if (isWagonInTrain(wagon)) {
+                return false; // Wagon is already part of the train
+            }
+
             while (currentWagon.getNextWagon() != null) {
                 currentWagon = currentWagon.getNextWagon();
                 totalOfWagons++;
