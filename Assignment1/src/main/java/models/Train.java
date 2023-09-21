@@ -151,12 +151,10 @@ public class Train {
          Wagon currentWagon = this.firstWagon; // Start with the first wagon
 
          while (currentWagon != null) {
-             if (currentWagon instanceof PassengerWagon) { // Check if it's a passenger wagon
-                 if (index == position) {
-                     return currentWagon; // Found the wagon at the desired position
-                 }
-                 index++;
+             if (index == position) {
+                 return currentWagon; // Found the wagon at the desired position
              }
+             index++;
              currentWagon = currentWagon.getNextWagon(); // Move to the next wagon
          }
 
@@ -298,26 +296,38 @@ public class Train {
      * @return  whether the insertion could be completed successfully
      */
     public boolean insertAtFront(Wagon wagon) {
-        int currentTotalWagons = 0;
+        int totalWagonsToAttach = 0;
+        Wagon trackTotalNewWagons = wagon;
 
         if (this.firstWagon == null) {
-            return false;
+            this.firstWagon = wagon;
+            return true;
         }
 
-        if (currentTotalWagons < this.engine.getMaxWagons()) {
-            Wagon currentWagon = this.firstWagon;
+        if (isWagonInTrain(wagon)) {
+            return false; // Wagon is already part of the train
+        }
 
-            if (wagon.hasPreviousWagon()) {   // Remove predecessors
-                wagon.setPreviousWagon(null);
-            }
+        Wagon currentWagon = this.firstWagon;
 
-            while(currentWagon.hasPreviousWagon()) {
-                currentWagon = currentWagon.getPreviousWagon();     // Move to the next wagon
-                currentTotalWagons++;
-            }
+        while(trackTotalNewWagons != null) { // Calculate how many wagons need to be added
+            totalWagonsToAttach++;
+            trackTotalNewWagons = trackTotalNewWagons.getNextWagon();
+        }
 
-            currentWagon.setPreviousWagon(wagon);
-            this.firstWagon = currentWagon.getPreviousWagon();
+        int sum = this.getNumberOfWagons() + totalWagonsToAttach;
+
+        // Detach the head wagon from its predecessors (if any)
+        if (wagon.hasPreviousWagon() && sum <= this.getEngine().getMaxWagons()) {
+            wagon.getPreviousWagon().setNextWagon(null);
+            wagon.setPreviousWagon(null);
+        }
+
+        if (sum <= this.getEngine().getMaxWagons()) {
+            currentWagon.setPreviousWagon(wagon.getLastWagonAttached()); // Set new wagon head as previous wagon
+            wagon.getLastWagonAttached().setNextWagon(currentWagon); // Attach current wagons to new wagon sequence
+            this.firstWagon = wagon; // Push new wagon to front
+            return true;
         }
 
         // Return false if wagon was unable to be attached to train
