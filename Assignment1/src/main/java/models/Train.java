@@ -394,8 +394,8 @@ public class Train {
         // Insert the sequence of wagons at the specified position
         if (position == 0) {
             if (this.firstWagon != null) {
-                wagon.setNextWagon(this.firstWagon);
-                this.firstWagon.setPreviousWagon(wagon);
+                wagon.getLastWagonAttached().setNextWagon(this.firstWagon);
+                this.firstWagon.setPreviousWagon(wagon.getLastWagonAttached());
             }
             this.firstWagon = wagon;
         } else {
