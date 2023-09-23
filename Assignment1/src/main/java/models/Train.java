@@ -401,6 +401,7 @@ public class Train {
         } else {
             Wagon previousWagon = findWagonAtPosition(position - 1); // Find the previous wagon
             wagon.getLastWagonAttached().setNextWagon(previousWagon.getNextWagon()); // Assign next wagon to end of given wagon sequence
+            previousWagon.setPreviousWagon(wagon.getLastWagonAttached());
             wagon.setPreviousWagon(previousWagon);
             previousWagon.setNextWagon(wagon);
         }
