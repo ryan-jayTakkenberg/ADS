@@ -216,6 +216,7 @@ public class TrainTest {
                 "attachToRear should disconnect and reattach the complete sequence to the rear");
         assertEquals(8004, trainWithoutWagons.findWagonAtPosition(4).getId(),
                 "attachToRear should disconnect and reattach the complete sequence to the rear");
+        System.out.println(trainWithoutWagons.getNumberOfWagons());
         assertEquals(8005, trainWithoutWagons.getLastWagonAttached().getId(),
                 "attachToRear should disconnect and reattach the complete sequence to the rear");
 

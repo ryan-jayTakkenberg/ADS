@@ -173,7 +173,7 @@ public abstract class Wagon {
         if (this.getPreviousWagon() != null) {
             this.detachFront();
         }
-        
+
         if (front.getNextWagon() != null) {
             front.detachTail();
         }
@@ -203,7 +203,7 @@ public abstract class Wagon {
             nextWagon.detachFront(); // Detach the next wagon from this wagon
         }
 
-        // Clear the references to previous and next wagons
+
         this.previousWagon = null;
         this.nextWagon = null;
     }
