@@ -55,4 +55,6 @@ public class DetectionTest {
         Detection detection1 = new Detection(scoda, "Leiden", LocalDateTime.of(2022,10,1,12,11,10));
         assertEquals("1-AAA-02/Leiden/2022-10-01T12:11:10", detection1.toString());
     }
+
+
 }

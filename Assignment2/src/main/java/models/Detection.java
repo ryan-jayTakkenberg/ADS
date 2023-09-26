@@ -23,28 +23,29 @@ public class Detection {
     }
 
     /**
-     * Parses detection information from a line of text about a car that has entered an environmentally controlled zone
-     * of a specified city.
-     * the format of the text line is: lisensePlate, city, dateTime
-     * The licensePlate shall be matched with a car from the provided list.
-     * If no matching car can be found, a new Car shall be instantiated with the given lisensePlate and added to the list
-     * (besides the license plate number there will be no other information available about this car)
+     * Parseert detectie-informatie van een tekstregel over een auto die een milieugecontroleerde zone van een opgegeven stad is binnengekomen.
+     * Het formaat van de tekstregel is: kentekenplaat, stad, datumTijd.
+     * De kentekenplaat moet overeenkomen met een auto uit de verstrekte lijst.
+     * Als er geen overeenkomende auto kan worden gevonden, wordt een nieuwe Car geïnstantieerd met de opgegeven kentekenplaat en toegevoegd aan de lijst
+     * (behalve het kentekenplaatnummer zal er geen andere informatie beschikbaar zijn over deze auto)
      * @param textLine
-     * @param cars     a list of known cars, ordered and searchable by licensePlate
-     *                 (i.e. the indexOf method of the list shall only consider the lisensePlate when comparing cars)
-     * @return a new Detection instance with the provided information
-     * or null if the textLine is corrupt or incomplete
+     * @param cars     een lijst van bekende auto's, geordend en doorzoekbaar op kentekenplaat
+     *                 (dwz de indexOf-methode van de lijst houdt alleen rekening met de kentekenplaat bij het vergelijken van auto's)
+     * @return een nieuwe Detection-instantie met de verstrekte informatie
+     * of null als de tekstregel corrupt of onvolledig is
      */
     public static Detection fromLine(String textLine, List<Car> cars) {
-        Detection newDetection = null;
+        Detection nieuweDetectie = null;
 
-        // TODO convert the information in the textLine into a new Detection instance
-        //  use the cars.indexOf to find the car that is associated with the licensePlate of the detection
-        //  if no car can be found a new Car shall be instantiated and added to the list and associated with the detection
+        cars.indexOf(cars);
 
+        // TODO zet de informatie in de tekstregel om in een nieuwe Detection-instantie
+        //  gebruik cars.indexOf om de auto te vinden die is gekoppeld aan de kentekenplaat van de detectie
+        //  als er geen auto kan worden gevonden, wordt een nieuwe Car geïnstantieerd en toegevoegd aan de lijst en gekoppeld aan de detectie
 
-        return newDetection;
+        return nieuweDetectie;
     }
+
 
     /**
      * Validates a detection against the purple conditions for entering an environmentally restricted zone
@@ -77,7 +78,7 @@ public class Detection {
     public String toString() {
         // TODO represent the detection in the format: licensePlate/city/dateTime
 
-        return "TODO:Detection.toString";       // replace by a proper outcome
+        return car+"/"+city+"/"+dateTime;       // replace by a proper outcome
     }
 
 }
