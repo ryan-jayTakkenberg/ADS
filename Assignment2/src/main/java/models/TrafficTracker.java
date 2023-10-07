@@ -19,6 +19,8 @@ public class TrafficTracker {
         //  initalize violations with an empty ordered list which sorts items by car and city.
         //  Use your generic implementation class OrderedArrayList
 
+        this.cars = new OrderedArrayList<Car>();
+        this.violations = new OrderedArrayList<Violation>();
 
     }
 
@@ -27,7 +29,9 @@ public class TrafficTracker {
      * @param resourceName
      */
     public void importCarsFromVault(String resourceName) {
-        this.cars.clear();
+        if (this.cars != null)
+            this.cars.clear();
+
 
         // load all cars from the text file
         int numberOfLines = importItemsFromFile(this.cars,
