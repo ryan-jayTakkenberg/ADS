@@ -50,7 +50,20 @@ public class OrderedArrayList<E>
     //   do not invoke a sort or reorder items otherwise differently than is specified by the ArrayList contract)
 
 
+    @Override
+    public void add(int index, E element) {
+        super.add(index, element);
+    }
 
+    @Override
+    public E remove(int index) {
+        return super.remove(index);
+    }
+
+    @Override
+    public boolean remove(Object o) {
+        return super.remove(o);
+    }
 
     @Override
     public void sort() {

@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Collections;
+
 public class Violation {
     private final Car car;
     private final String city;
@@ -13,6 +15,9 @@ public class Violation {
 
     public static int compareByLicensePlateAndCity(Violation v1, Violation v2) {
         // TODO compute the sort order of v1 vs v2 as per conventions of Comparator<Violation>
+//        OrderedArrayList alist = new OrderedArrayList();
+//
+//        alist.sort();
 
 
         return 0;   // replace by a proper outcome
@@ -61,6 +66,6 @@ public class Violation {
     @Override
     public String toString() {
 
-        return "TODO:Violation.toString";   // replace by a proper outcome
+        return car.getLicensePlate() + "/" + this.city + "/" + this.offencesCount;       // replace by a proper outcome
     }
 }

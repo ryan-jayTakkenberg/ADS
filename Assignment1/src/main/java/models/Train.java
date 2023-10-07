@@ -381,7 +381,7 @@ public class Train {
         }
 
         // Verify that the given position is valid for insertion
-        if (position < 0 || position > this.getNumberOfWagons()) {
+        if (position < 0 || position > this.engine.getMaxWagons()) {
             return false; // Invalid position
         }
 
