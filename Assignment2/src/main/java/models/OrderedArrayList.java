@@ -51,6 +51,13 @@ public class OrderedArrayList<E>
 
 
     @Override
+    public void sort() {
+        if (this.nSorted < this.size()) {
+            this.sort(this.sortOrder);
+        }
+    }
+
+    @Override
     public void add(int index, E element) {
         super.add(index, element);
     }
@@ -63,13 +70,6 @@ public class OrderedArrayList<E>
     @Override
     public boolean remove(Object o) {
         return super.remove(o);
-    }
-
-    @Override
-    public void sort() {
-        if (this.nSorted < this.size()) {
-            this.sort(this.sortOrder);
-        }
     }
 
     @Override

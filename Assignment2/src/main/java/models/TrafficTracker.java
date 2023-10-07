@@ -15,12 +15,18 @@ public class TrafficTracker {
     private OrderedList<Violation> violations;      // the accumulation of all offences by car and by city
 
     public TrafficTracker() {
-        // TODO initialize cars with an empty ordered list which sorts items by licensePlate.
-        //  initalize violations with an empty ordered list which sorts items by car and city.
-        //  Use your generic implementation class OrderedArrayList
+        // Initialize cars with an empty ordered list which sorts items by licensePlate
+        this.cars = new OrderedArrayList<>(Comparator.comparing(Car::getLicensePlate));
 
-        this.cars = new OrderedArrayList<Car>();
-        this.violations = new OrderedArrayList<Violation>();
+        // Initialize violations with an empty ordered list which sorts items by car and city
+        this.violations = new OrderedArrayList<>((v1, v2) -> {
+            int compareCars = v1.getCar().getLicensePlate().compareTo(v2.getCar().getLicensePlate());
+            if (compareCars == 0) {
+                return v1.getCity().compareTo(v2.getCity());
+            } else {
+                return compareCars;
+            }
+        });
 
     }
 
@@ -29,9 +35,7 @@ public class TrafficTracker {
      * @param resourceName
      */
     public void importCarsFromVault(String resourceName) {
-        if (this.cars != null)
-            this.cars.clear();
-
+        this.cars.clear();
 
         // load all cars from the text file
         int numberOfLines = importItemsFromFile(this.cars,
@@ -188,13 +192,18 @@ public class TrafficTracker {
             String line = scanner.nextLine();
             numberOfLines++;
 
-            // TODO convert the line to an instance of E
+            // Convert the line to an instance of E using the converter function
+            try {
+                E item = converter.apply(line);
+                if (item != null) {
 
-
-
-            // TODO add a successfully converted item to the list of items
-
-
+                    // Add the successfully converted item to the list of items
+                    items.add(item);
+                }
+            } catch (Exception e) {
+                // Handle any exceptions that may occur during conversion
+                System.err.println("Error while converting line " + numberOfLines + ": " + e.getMessage());
+            }
         }
 
         //System.out.printf("Imported %d lines from %s.\n", numberOfLines, file.getPath());
