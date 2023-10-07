@@ -1,6 +1,7 @@
 package models;
 
 import java.util.Collections;
+import java.util.Comparator;
 
 public class Violation {
     private final Car car;
@@ -15,12 +16,25 @@ public class Violation {
 
     public static int compareByLicensePlateAndCity(Violation v1, Violation v2) {
         // TODO compute the sort order of v1 vs v2 as per conventions of Comparator<Violation>
-//        OrderedArrayList alist = new OrderedArrayList();
-//
-//        alist.sort();
 
+        // Compare the license plates
+        int compareLicensePlates = v1.getCar().getLicensePlate().compareTo(v2.getCar().getLicensePlate());
 
-        return 0;   // replace by a proper outcome
+        // If license plates are not similar, return the result
+        if (compareLicensePlates != 0) {
+            return compareLicensePlates;
+        } else {
+            // If license plates are similar, compare cities
+            int compareCities = v1.getCity().compareTo(v2.getCity());
+
+            // If cities are not similar, return the result
+            if (compareCities != 0) {
+                return compareCities;
+            } else {
+                // If license plates and cities equal, return 0
+                return 0;
+            }
+        }
     }
 
 
