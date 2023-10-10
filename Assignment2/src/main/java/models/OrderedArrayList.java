@@ -37,13 +37,19 @@ public class OrderedArrayList<E>
         if (index < 0) {
             index = -index - 1;
         }
+
+        if (index > size()) {
+            index = size();
+        }
+
         super.add(index, element);
+
         if (index < nSorted) {
             nSorted++;
         }
+
         return true;
     }
-
 
     // TODO override the ArrayList.add(index, item), ArrayList.remove(index) and Collection.remove(object) methods
     //  such that they both meet the ArrayList contract of these methods (see ArrayList JavaDoc)
@@ -54,14 +60,15 @@ public class OrderedArrayList<E>
 
     @Override
     public void sort() {
-        if (this.nSorted < this.size()) {
-            this.sort(this.sortOrder);
-        }
+        super.sort(sortOrder);
+        nSorted = size();
     }
 
     @Override
     public void add(int index, E element) {
         super.add(index, element);
+            nSorted++;
+
     }
 
     @Override
@@ -105,40 +112,34 @@ public class OrderedArrayList<E>
      * @return the position index of the found item in the arrayList, or -1 if no item matches the search item.
      */
     public int indexOfByIterativeBinarySearch(E searchItem) {
-        int low = 0; //lowest point of the array
-        int high = nSorted - 1;//highest point of de sorted array
+        int low = 0; // Laagste punt van de array
+        int high = nSorted - 1; // Hoogste punt van de gesorteerde array
 
         while (low <= high) {
-            int mid = (low + high) / 2;// find the middel of the array
-            int compare = sortOrder.compare(get(mid), searchItem);// compare with de middel one
+            int mid = (low + high) / 2; // Vind het midden van de array
+            int compare = sortOrder.compare(get(mid), searchItem); // Vergelijk met het middelste element
 
-            if (compare < 0) {// if it is lower dan de middel f cmp is less than 0, it means that searchItem
-                // should be on the right side of the
-                // mid element in the sorted section
-                low = mid + 1;
-            } else if (compare > 0) {//If cmp is greater than 0, it means that searchItem should be on
-                // the left side of the mid
-                // element in the sorted section.
-                high = mid - 1;
+            if (compare < 0) {
+                low = mid + 1; // Als compare kleiner is dan 0, betekent dit dat searchItem aan de rechterkant van
+                // het middelste element in het gesorteerde gedeelte moet staan
+            } else if (compare > 0) {
+                high = mid - 1; // Als compare groter is dan 0, betekent dit dat searchItem aan de linkerkant van
+                // het middelste element in het gesorteerde gedeelte moet staan.
             } else {
-                return mid;
+                return mid; // We hebben een overeenkomst gevonden
             }
         }
 
-
+        // Als we hier zijn, betekent dit dat we geen overeenkomst hebben gevonden in het gesorteerde gedeelte.
+        // Laten we het proberen in het ongesorteerde gedeelte.
         for (int i = 0; i < size(); i++) {
             if (sortOrder.compare(get(i), searchItem) == 0) {
                 return i;
             }
-
-
         }
 
-
-        // TODO implement an iterative binary search on the sorted section of the arrayList, 0 <= index < nSorted
-        //   to find the position of an item that matches searchItem (this.sortOrder comparator yields a 0 result)
-        // TODO if no match was found, attempt a linear search of searchItem in the section nSorted <= index < size()
-        return -1;  // nothing was found ???
+        // Als er geen overeenkomst is gevonden, retourneer -1
+        return -1;
     }
 
     /**
@@ -228,10 +229,10 @@ public class OrderedArrayList<E>
     public double aggregate(Function<E, Double> mapper) {
         double sum = 0.0;
 
-         for (E item : this){
-             double contribution = mapper.apply(item);
-             sum += contribution;
-         }
+        for (E item : this) {
+            double contribution = mapper.apply(item);
+            sum += contribution;
+        }
 
         return sum;
 
