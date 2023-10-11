@@ -31,25 +31,6 @@ public class OrderedArrayList<E>
         return this.sortOrder;
     }
 
-    @Override
-    public boolean add(E element) {
-        int index = nSorted;
-        if (index < 0) {
-            index = -index - 1;
-        }
-
-        if (index > size()) {
-            index = size();
-        }
-
-        super.add(index, element);
-
-        if (index < nSorted) {
-            nSorted++;
-        }
-
-        return true;
-    }
 
     // TODO override the ArrayList.add(index, item), ArrayList.remove(index) and Collection.remove(object) methods
     //  such that they both meet the ArrayList contract of these methods (see ArrayList JavaDoc)
@@ -63,24 +44,31 @@ public class OrderedArrayList<E>
         super.sort(sortOrder);
         nSorted = size();
     }
-
-    @Override
     public void add(int index, E element) {
         super.add(index, element);
-            nSorted++;
-
+        if (index < nSorted) {
+            nSorted = index;
+        }
     }
 
-    @Override
     public E remove(int index) {
-        return super.remove(index);
+        E removedItem = super.remove(index);
+        if (index < nSorted) {
+            nSorted--;
+        }
+        return removedItem;
     }
 
-    @Override
-    public boolean remove(Object o) {
-        return super.remove(o);
+    public boolean remove(Object item) {
+        boolean isRemoved = super.remove(item);
+        if (isRemoved) {
+            int index = indexOf(item);
+            if (index < nSorted) {
+                nSorted--;
+            }
+        }
+        return false;
     }
-
     @Override
     public int indexOf(Object item) {
         // efficient search can be done only if you have provided an sortOrder for the list
