@@ -1,7 +1,6 @@
 package models;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.*;
@@ -64,6 +63,8 @@ public class TrafficTracker {
                 totalNumberOfOffences, resourceName);
     }
 
+
+
     /**
      * traverses the detections vault recursively and processes every data file that it finds
      * @param file
@@ -78,7 +79,6 @@ public class TrafficTracker {
 
             // TODO recursively process all files and sub folders from the filesInDirectory list.
             //  also track the total number of offences found
-
 
 
         } else if (file.getName().matches(TRAFFIC_FILE_PATTERN)) {
@@ -96,6 +96,7 @@ public class TrafficTracker {
      * @param file
      */
     private int mergeDetectionsFromFile(File file) {
+        Scanner scanner = createFileScanner(file);
 
         // re-sort the accumulated violations for efficient searching and merging
         this.violations.sort();
@@ -103,21 +104,28 @@ public class TrafficTracker {
         // use a regular ArrayList to load the raw detection info from the file
         List<Detection> newDetections = new ArrayList<>();
 
-        // TODO import all detections from the specified file into the newDetections list
-        //  using the importItemsFromFile helper method and the Detection.fromLine parser.
+        while (scanner.hasNext()) {
+            // input another line with author information
 
+            // Read a line from the scanner, assuming it contains detection information.
+            String detectionLine = scanner.nextLine();
 
+            // Parse the line and add the resulting Detection to the newDetections list.
+            Detection newDetection = Detection.fromLine(detectionLine, this.cars);
+            newDetections.add(newDetection);
+        }
 
         System.out.printf("Imported %d detections from %s.\n", newDetections.size(), file.getPath());
 
         int totalNumberOfOffences = 0; // tracks the number of offences that emerges from the data in this file
 
-        // TODO validate all detections against the purple criteria and
-        //  merge any resulting offences into this.violations, accumulating offences per car and per city
-        //  also keep track of the totalNumberOfOffences for reporting
-
-
-
+        // Check purple validation for each detection in array
+        for (Detection detection : newDetections) {
+            if (detection.validatePurple() != null && !this.violations.contains(detection.validatePurple())) {
+                this.violations.add(detection.validatePurple());
+                totalNumberOfOffences++;
+            }
+        }
 
         return totalNumberOfOffences;
     }

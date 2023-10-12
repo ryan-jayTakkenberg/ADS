@@ -96,7 +96,7 @@ public class Detection {
 
         if (car.getCarType() == CarType.valueOf("Truck") || car.getCarType() == CarType.valueOf("Coach")) {
             if (car.getFuelType() == FuelType.Diesel) {
-                if (car.getEmissionCategory() >= 6) {
+                if (car.getEmissionCategory() < 6) {
                     return new Violation(chosenCar, city);
 
                 } else {
