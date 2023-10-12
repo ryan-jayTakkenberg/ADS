@@ -3,6 +3,7 @@ package models;
 import java.io.*;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
 
@@ -63,8 +64,6 @@ public class TrafficTracker {
                 totalNumberOfOffences, resourceName);
     }
 
-
-
     /**
      * traverses the detections vault recursively and processes every data file that it finds
      * @param file
@@ -76,6 +75,20 @@ public class TrafficTracker {
             // the file is a folder (a.k.a. directory)
             //  retrieve a list of all files and sub folders in this directory
             File[] filesInDirectory = Objects.requireNonNullElse(file.listFiles(), new File[0]);
+
+            // Iterate through the Directory
+            for (File scannedFile : filesInDirectory) {
+                // Check if sub-directory is a directory
+                if (scannedFile.isDirectory()) {
+                    // Scan files in sub-directories and add to array
+                    File[] filesInSubDirectory = scannedFile.listFiles();
+
+                    // Iterate through files recursively
+                    for (File subFile: filesInSubDirectory) {
+                        totalNumberOfOffences += this.mergeDetectionsFromVaultRecursively(subFile);
+                    }
+                }
+            }
 
             // TODO recursively process all files and sub folders from the filesInDirectory list.
             //  also track the total number of offences found

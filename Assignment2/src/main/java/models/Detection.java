@@ -1,8 +1,6 @@
 package models;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
-import java.util.Date;
 import java.util.List;
 
 import static models.Car.CarType;
@@ -128,9 +126,8 @@ public class Detection {
 
     @Override
     public String toString() {
-        // TODO represent the detection in the format: licensePlate/city/dateTime
 
-        return car.getLicensePlate() + "/" + city + "/" + dateTime;       // replace by a proper outcome
+        return car.getLicensePlate() + "/" + city + "/" + dateTime;
     }
 
 
