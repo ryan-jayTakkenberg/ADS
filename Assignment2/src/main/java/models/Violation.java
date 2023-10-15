@@ -34,9 +34,6 @@ public class Violation {
             }
         }
     }
-
-
-
     /**
      * Aggregates this violation with the other violation by adding their counts and
      * nullifying identifying attributes car and/or city that do not match
@@ -46,17 +43,20 @@ public class Violation {
      * @return  a new violation with the accumulated offencesCount and matching identifying attributes.
      */
     public Violation combineOffencesCounts(Violation other) {
-        Violation combinedViolation = new Violation(
-                // nullify the car attribute iff this.car does not match other.car
-                this.car != null && this.car.equals(other.car) ? this.car : null,
-                // nullify the city attribute iff this.city does not match other.city
-                this.city != null && this.city.equals(other.city) ? this.city : null);
+        if (this.car != null && other.car != null && this.car.equals(other.car) &&
+                this.city != null && other.city != null && this.city.equals(other.city)) {
+            // Als de auto en stad overeenkomen, maak een nieuwe instantie met de gecombineerde overtredingen
+            Violation combinedViolation = new Violation(this.car, this.city);
+            combinedViolation.setOffencesCount(this.offencesCount + other.offencesCount);
+            return combinedViolation;
+        } else {
+            // Als de auto of stad niet overeenkomen, retourneer de huidige instantie
+            return this;
+        }
 
-        // add the offences counts of both original violations
-        combinedViolation.setOffencesCount(this.offencesCount + other.offencesCount);
-
-        return combinedViolation;
     }
+
+
 
     public Car getCar() {
         return car;

@@ -109,39 +109,37 @@ public class TrafficTracker {
      * @param file
      */
     private int mergeDetectionsFromFile(File file) {
-        Scanner scanner = createFileScanner(file);
 
         // re-sort the accumulated violations for efficient searching and merging
         this.violations.sort();
 
         // use a regular ArrayList to load the raw detection info from the file
         List<Detection> newDetections = new ArrayList<>();
+        TrafficTracker.importItemsFromFile(newDetections, file, new Function<String, Detection>() {
+            @Override
+            public Detection apply(String s) {
+                return Detection.fromLine(s, cars);
+            }
+        });
 
-        while (scanner.hasNext()) {
-            // input another line with author information
-
-            // Read a line from the scanner, assuming it contains detection information.
-            String detectionLine = scanner.nextLine();
-
-            // Parse the line and add the resulting Detection to the newDetections list.
-            Detection newDetection = Detection.fromLine(detectionLine, this.cars);
-            newDetections.add(newDetection);
-        }
 
         System.out.printf("Imported %d detections from %s.\n", newDetections.size(), file.getPath());
 
         int totalNumberOfOffences = 0; // tracks the number of offences that emerges from the data in this file
 
-        // Check purple validation for each detection in array
-        for (Detection detection : newDetections) {
-            if (detection.validatePurple() != null && !this.violations.contains(detection.validatePurple())) {
-                this.violations.add(detection.validatePurple());
-                totalNumberOfOffences++;
+        for (Detection newDetection : newDetections) {
+            Violation violation = newDetection.validatePurple();
+
+            boolean isNotNull = this.violations.merge(violation, Violation::combineOffencesCounts);
+
+            if (isNotNull) {
+                totalNumberOfOffences += 1;
             }
         }
 
         return totalNumberOfOffences;
     }
+
 
     /**
      * calculates the total revenue of fines from all violations,
@@ -149,14 +147,33 @@ public class TrafficTracker {
      * @return      the total amount of money recovered from all violations
      */
     public double calculateTotalFines() {
+        double totalFines = 0.0;
 
-        return this.violations.aggregate(
-                // TODO provide a calculator function for the specified fine scheme
-                //  of €25 per truck-offence and €35 per coach-offence
+        for (Violation violation : violations) {
+            Car car = violation.getCar();
 
-                null  // replace this reference
-        );
+            if (car != null) {
+                Car.CarType vehicleType = car.getCarType();
+                double fine = 0.0;
+
+                if (vehicleType == Car.CarType.Truck) {
+                    fine = 25.0;
+                } else if (vehicleType == Car.CarType.Coach) {
+                    fine = 35.0;
+                }
+
+                totalFines += fine * violation.getOffencesCount();
+            }
+        }
+
+        return totalFines;
     }
+
+
+
+
+
+
 
     /**
      * Prepares a list of topNumber of violations that show the highest offencesCount
@@ -164,32 +181,36 @@ public class TrafficTracker {
      * @param topNumber     the requested top number of violations in the result list
      * @return              a list of topNum items that provides the top aggregated violations
      */
+
+
     public List<Violation> topViolationsByCar(int topNumber) {
+        // Maak een kopie van de lijst van violations
+        List<Violation> copyViolations = new ArrayList<>(violations);
 
-        // TODO merge all violations from this.violations into a new OrderedArrayList
-        //   which orders and aggregates violations by city
-        // TODO sort the new list by decreasing offencesCount.
-        // TODO use .subList to return only the topNumber of violations from the sorted list
-        //  (You may want to prepare/reuse a local private method for all this)
+        // Sorteer de kopie van de lijst op decreasing offencesCount
+        copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
 
-        return null;  // replace this reference
+        // Beperk de lijst tot de topNumber items
+        if (topNumber < copyViolations.size()) {
+            copyViolations = copyViolations.subList(0, topNumber);
+        }
+
+        return copyViolations;
     }
 
-    /**
-     * Prepares a list of topNumber of violations that show the highest offencesCount
-     * when this.violations are aggregated by city across all cars.
-     * @param topNumber     the requested top number of violations in the result list
-     * @return              a list of topNum items that provides the top aggregated violations
-     */
     public List<Violation> topViolationsByCity(int topNumber) {
+        // Maak een kopie van de lijst van violations
+        List<Violation> copyViolations = new ArrayList<>(violations);
 
-        // TODO merge all violations from this.violations into a new OrderedArrayList
-        //   which orders and aggregates violations by Car
-        // TODO sort the new list by decreasing offencesCount.
-        // TODO use .subList to return only the topNumber of violations from the sorted list
-        //  (You may want to prepare/reuse a local private method for all this)
+        // Sorteer de kopie van de lijst op decreasing offencesCount
+        copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
 
-        return null;  // replace this reference
+        // Beperk de lijst tot de topNumber items
+        if (topNumber < copyViolations.size()) {
+            copyViolations = copyViolations.subList(0, topNumber);
+        }
+
+        return copyViolations;
     }
 
 
