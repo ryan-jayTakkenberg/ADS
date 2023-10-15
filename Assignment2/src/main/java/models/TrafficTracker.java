@@ -90,9 +90,6 @@ public class TrafficTracker {
                 }
             }
 
-            // TODO recursively process all files and sub folders from the filesInDirectory list.
-            //  also track the total number of offences found
-
 
         } else if (file.getName().matches(TRAFFIC_FILE_PATTERN)) {
             // the file is a regular file that matches the target pattern for raw detection files
@@ -170,11 +167,6 @@ public class TrafficTracker {
     }
 
 
-
-
-
-
-
     /**
      * Prepares a list of topNumber of violations that show the highest offencesCount
      * when this.violations are aggregated by car across all cities.
@@ -184,13 +176,13 @@ public class TrafficTracker {
 
 
     public List<Violation> topViolationsByCar(int topNumber) {
-        // Maak een kopie van de lijst van violations
+        // Make a copy of the violations list
         List<Violation> copyViolations = new ArrayList<>(violations);
 
-        // Sorteer de kopie van de lijst op decreasing offencesCount
+        // Sort the list on decreasing offencesCount
         copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
 
-        // Beperk de lijst tot de topNumber items
+        // Limit the list to the topNumber items
         if (topNumber < copyViolations.size()) {
             copyViolations = copyViolations.subList(0, topNumber);
         }
@@ -199,13 +191,13 @@ public class TrafficTracker {
     }
 
     public List<Violation> topViolationsByCity(int topNumber) {
-        // Maak een kopie van de lijst van violations
+        // Make a copy of the violations list
         List<Violation> copyViolations = new ArrayList<>(violations);
 
-        // Sorteer de kopie van de lijst op decreasing offencesCount
+        // Sort the list on decreasing offencesCount
         copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
 
-        // Beperk de lijst tot de topNumber items
+        // Limit the list to the topNumber items
         if (topNumber < copyViolations.size()) {
             copyViolations = copyViolations.subList(0, topNumber);
         }
