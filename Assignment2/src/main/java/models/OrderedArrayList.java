@@ -100,35 +100,36 @@ public class OrderedArrayList<E>
      * @return the position index of the found item in the arrayList, or -1 if no item matches the search item.
      */
     public int indexOfByIterativeBinarySearch(E searchItem) {
-        int low = 0; // Laagste punt van de array
-        int high = nSorted - 1; // Hoogste punt van de gesorteerde array
+        int low = 0; // Lowest point of the array
+        int high = nSorted - 1; // Highest point of the sorted array
 
         while (low <= high) {
-            int mid = (low + high) / 2; // Vind het midden van de array
-            int compare = sortOrder.compare(get(mid), searchItem); // Vergelijk met het middelste element
+            int mid = (low + high) / 2; // Find the middle of the array
+            int compare = sortOrder.compare(get(mid), searchItem); // Compare with the middle element
 
             if (compare < 0) {
-                low = mid + 1; // Als compare kleiner is dan 0, betekent dit dat searchItem aan de rechterkant van
-                // het middelste element in het gesorteerde gedeelte moet staan
+                low = mid + 1; // If compare is less than 0, it means the searchItem should be on the right side of
+                // the middle element in the sorted section
             } else if (compare > 0) {
-                high = mid - 1; // Als compare groter is dan 0, betekent dit dat searchItem aan de linkerkant van
-                // het middelste element in het gesorteerde gedeelte moet staan.
+                high = mid - 1; // If compare is greater than 0, it means the searchItem should be on the left side of
+                // the middle element in the sorted section.
             } else {
-                return mid; // We hebben een overeenkomst gevonden
+                return mid; // We have found a match
             }
         }
 
-        // Als we hier zijn, betekent dit dat we geen overeenkomst hebben gevonden in het gesorteerde gedeelte.
-        // Laten we het proberen in het ongesorteerde gedeelte.
+        // If we are here, it means we haven't found a match in the sorted section.
+        // Let's try in the unsorted section.
         for (int i = 0; i < size(); i++) {
             if (sortOrder.compare(get(i), searchItem) == 0) {
                 return i;
             }
         }
 
-        // Als er geen overeenkomst is gevonden, retourneer -1
+        // If no match is found, return -1
         return -1;
     }
+
 
     /**
      * finds the position of the searchItem by a recursive binary search algorithm in the
@@ -200,9 +201,6 @@ public class OrderedArrayList<E>
             this.set(matchedItemIndex, mergedItem);// adden by yhe index
             return false;
 
-
-            // TODO retrieve the matched item and
-            //  replace the matched item in the list with the merger of the matched item and the newItem
 
         }
     }

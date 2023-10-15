@@ -35,51 +35,52 @@ public class Detection {
      * of null als de tekstregel corrupt of onvolledig is
      */
     public static Detection fromLine(String textLine, List<Car> cars) {
-        Detection nieuweDetectie = null;
+        Detection newDetection = null;
 
         String[] detectionParts = textLine.split(",");
 
-        // Zorg ervoor dat de tekstregel de verwachte indeling heeft (kentekenplaat, stad, datumTijd)
+        // Ensure that the text line has the expected format (license plate, city, dateTime)
         if (detectionParts.length == 3) {
-            String carPlate = detectionParts[0].trim();
+            String licensePlate = detectionParts[0].trim();
             String city = detectionParts[1].trim();
             String dateTimeStr = detectionParts[2].trim();
 
-            // Probeer de datumtijd te parsen naar een LocalDateTime-object
+            // Attempt to parse the dateTime into a LocalDateTime object
             LocalDateTime dateTime = null;
             try {
                 dateTime = LocalDateTime.parse(dateTimeStr);
             } catch (Exception e) {
-                // Als de parsing mislukt, kun je hier een foutafhandeling toevoegen
+                // You can add error handling here if parsing fails
                 e.printStackTrace();
             }
 
             if (dateTime != null) {
                 int index = -1;
 
-                // Zoek naar een overeenkomende auto in de lijst van bekende auto's
+                // Search for a matching car in the list of known cars
                 for (int i = 0; i < cars.size(); i++) {
-                    if (cars.get(i).getLicensePlate().equals(carPlate)) {
+                    if (cars.get(i).getLicensePlate().equals(licensePlate)) {
                         index = i;
                         break;
                     }
                 }
 
-                // Controleer of een overeenkomende auto is gevonden
+                // Check if a matching car was found
                 if (index != -1) {
-                    // Een overeenkomende auto is gevonden, maak een nieuwe Detection-instantie aan
-                    nieuweDetectie = new Detection(cars.get(index), city, dateTime);
+                    // A matching car was found, create a new Detection instance
+                    newDetection = new Detection(cars.get(index), city, dateTime);
                 } else {
-                    // Geen overeenkomende auto gevonden, maak een nieuwe Car en Detection-instantie aan
-                    Car nieuweAuto = new Car(carPlate);
-                    cars.add(nieuweAuto); // Voeg de nieuwe auto toe aan de lijst van bekende auto's
-                    nieuweDetectie = new Detection(nieuweAuto, city, dateTime);
+                    // No matching car found, create a new Car and Detection instance
+                    Car newCar = new Car(licensePlate);
+                    cars.add(newCar); // Add the new car to the list of known cars
+                    newDetection = new Detection(newCar, city, dateTime);
                 }
             }
         }
 
-        return nieuweDetectie;
+        return newDetection;
     }
+
 
     /**
      * Validates a detection against the purple conditions for entering an environmentally restricted zone
@@ -93,7 +94,9 @@ public class Detection {
         Car chosenCar = car;
 
         if (car.getCarType() == CarType.valueOf("Truck") || car.getCarType() == CarType.valueOf("Coach")) {
+            //check if de cartype is Truck or Coach
             if (car.getFuelType() == FuelType.Diesel) {
+                //Chech if the fuel is Diesel
                 if (car.getEmissionCategory() < 6) {
                     return new Violation(chosenCar, city);
 

@@ -53,7 +53,6 @@ public class Violation {
             // Als de auto of stad niet overeenkomen, retourneer de huidige instantie
             return this;
         }
-
     }
 
 

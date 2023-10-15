@@ -6,6 +6,7 @@ import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Function;
+import java.util.stream.Collectors;
 
 public class TrafficTracker {
     private final String TRAFFIC_FILE_EXTENSION = ".txt";
