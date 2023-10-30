@@ -176,35 +176,39 @@ public class TrafficTracker {
      */
 
 
+    /**
+     * Prepares a list of topNumber violations that show the highest offencesCount
+     * when this.violations are aggregated by car across all cities.
+     * @param topNumber     the requested top number of violations in the result list
+     * @return              a list of topNum items that provides the top aggregated violations
+     */
     public List<Violation> topViolationsByCar(int topNumber) {
-        // Make a copy of the violations list
-        List<Violation> copyViolations = new ArrayList<>(violations);
+        return topViolations(topNumber, Comparator.comparing(Violation::getCar));
+    }
+    public List<Violation> topViolations (int topNumber, Comparator<Violation> comparator){
+        // making an ordered ArrayList with whatever comparator is given in the param
+        OrderedArrayList<Violation> violationsList = new OrderedArrayList<>(comparator);
 
-        // Sort the list on decreasing offencesCount
-        copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
+        // aggregate the Violations and merge them in the violations list
+        this.violations.forEach(violation -> violationsList.merge(violation, Violation::combineOffencesCounts));
+        // sort the list based on offencesCount from high to low
+        violationsList.sort(Comparator.comparing(Violation::getOffencesCount).reversed());
 
-        // Limit the list to the topNumber items
-        if (topNumber < copyViolations.size()) {
-            copyViolations = copyViolations.subList(0, topNumber);
-        }
-
-        return copyViolations;
+        // return a sublist with the help of the subList method, that contains the top violations. I also added a
+        // math.min so if the total list of violations is smaller than the topnumber there won't be an error
+        return violationsList.subList(0, Math.min(topNumber, violationsList.size()));
     }
 
+    /**
+     * Prepares a list of topNumber violations that show the highest offencesCount
+     * when this.violations are aggregated by city.
+     * @param topNumber     the requested top number of violations in the result list
+     * @return              a list of topNum items that provides the top aggregated violations
+     */
     public List<Violation> topViolationsByCity(int topNumber) {
-        // Make a copy of the violations list
-        List<Violation> copyViolations = new ArrayList<>(violations);
-
-        // Sort the list on decreasing offencesCount
-        copyViolations.sort((v1, v2) -> Integer.compare(v2.getOffencesCount(), v1.getOffencesCount()));
-
-        // Limit the list to the topNumber items
-        if (topNumber < copyViolations.size()) {
-            copyViolations = copyViolations.subList(0, topNumber);
-        }
-
-        return copyViolations;
+        return topViolations(topNumber, Comparator.comparing(Violation::getCity));
     }
+
 
 
     /**

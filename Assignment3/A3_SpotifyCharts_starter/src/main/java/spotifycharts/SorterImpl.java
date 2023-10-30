@@ -17,10 +17,18 @@ public class SorterImpl<E> implements Sorter<E> {
     public List<E> selInsBubSort(List<E> items, Comparator<E> comparator) {
         // TODO implement selection sort or insertion sort or bubble sort
 
+        for (int i = 1; i < items.size(); i++) {
+            E key = items.get(i);
+            int j = i - 1;
 
-
-
-        return items;   // replace as you find appropriate
+            while (j >= 0 && comparator.compare(items.get(j), key) > 0) {
+                items.set(j + 1, items.get(j));
+                j--;
+            }
+            items.set(j + 1, key);
+        }
+        return items;
+        // replace as you find appropriate
     }
 
     /**
@@ -32,12 +40,37 @@ public class SorterImpl<E> implements Sorter<E> {
      * @return  the items sorted in place
      */
     public List<E> quickSort(List<E> items, Comparator<E> comparator) {
-        // TODO provide a recursive quickSort implementation,
-        //  that is different from the example given in the lecture
+        quickSortPart(items, 0, items.size() - 1, comparator);
+        return items;
+    }
 
+    private void quickSortPart(List<E> items, int from, int to, Comparator<E> comparator) {
+        if (from < to) {
+            int partitionIndex = partition(items, from, to, comparator);
+            quickSortPart(items, from, partitionIndex - 1, comparator);
+            quickSortPart(items, partitionIndex + 1, to, comparator);
+        }
+    }
 
+    private int partition(List<E> items, int from, int to, Comparator<E> comparator) {
+        E pivot = items.get(to);
+        int i = from - 1;
 
-        return items;   // replace as you find appropriate
+        for (int j = from; j < to; j++) {
+            if (comparator.compare(items.get(j), pivot) < 0) {
+                i++;
+                swap(items, i, j);
+            }
+        }
+
+        swap(items, i + 1, to);
+        return i + 1;
+    }
+
+    private void swap(List<E> items, int i, int j) {
+        E temp = items.get(i);
+        items.set(i, items.get(j));
+        items.set(j, temp);
     }
 
     /**
@@ -94,6 +127,11 @@ public class SorterImpl<E> implements Sorter<E> {
             // TODO swap item[0] and item[i];
             //  this moves item[0] to its designated position
 
+            E temp = items.get(0);
+            items.set(0, items.get(i));
+            items.set(i, temp);
+
+            heapSink(items, i, reverseComparator);
 
 
             // TODO the new root may have violated the heap condition
@@ -117,9 +155,20 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      */
     protected void heapSwim(List<E> items, int heapSize, Comparator<E> comparator) {
-        // TODO swim items[heapSize-1] up the heap until
-        //      i==0 || items[(i-1]/2] <= items[i]
+        int childIndex = heapSize - 1;
+        int parentIndex = (childIndex - 1) / 2;
+        E swimmer = items.get(childIndex);
 
+        while (childIndex > 0 && comparator.compare(swimmer, items.get(parentIndex)) < 0) {
+            // Swap the child and parent
+            E temp = items.get(parentIndex);
+            items.set(parentIndex, swimmer);
+            items.set(childIndex, temp);
+
+            // Move up the heap
+            childIndex = parentIndex;
+            parentIndex = (childIndex - 1) / 2;
+        }
 
 
     }
@@ -134,10 +183,34 @@ public class SorterImpl<E> implements Sorter<E> {
      * @param comparator
      */
     protected void heapSink(List<E> items, int heapSize, Comparator<E> comparator) {
-        // TODO sink items[0] down the heap until
-        //      2*i+1>=heapSize || (items[i] <= items[2*i+1] && items[i] <= items[2*i+2])
+        int parentIndex = 0;
+        int childIndex = 2 * parentIndex + 1;
+        E sinker = items.get(parentIndex);
 
+        while (childIndex < heapSize) {
+            // Find the smaller child
+            if (childIndex + 1 < heapSize && comparator.compare(items.get(childIndex), items.get(childIndex + 1)) > 0) {
+                childIndex++;
+            }
 
+            // If the sinker is smaller than or equal to the smaller child, it's in the correct position.
+            if (comparator.compare(sinker, items.get(childIndex)) <= 0) {
+                break;
+            }
 
+            // Swap the parent and the smaller child
+            items.set(parentIndex, items.get(childIndex));
+            parentIndex = childIndex;
+            childIndex = 2 * parentIndex + 1;
+        }
+
+        // Place the sinker in its final position
+        items.set(parentIndex, sinker);
     }
+
+
+
+
+
 }
+
