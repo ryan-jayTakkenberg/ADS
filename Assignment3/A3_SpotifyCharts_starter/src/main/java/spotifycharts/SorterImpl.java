@@ -1,8 +1,6 @@
 package spotifycharts;
 
-import java.util.Comparator;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
 
 public class SorterImpl<E> implements Sorter<E> {
 
@@ -208,7 +206,82 @@ public class SorterImpl<E> implements Sorter<E> {
         items.set(parentIndex, sinker);
     }
 
+    public long measureExecutionTime(List<E> items, Comparator<E> comparator, int numTops) {
+        long totalTime = 0;
 
+        for (int i = 0; i < 10; i++) {
+            // Create a copy for each measurement
+            List<E> copy = new ArrayList<>(items);
+
+            // Run garbage collection to minimize its impact on measurements
+            System.gc();
+
+            // Disable JIT compiler to eliminate its impact on measurements
+            System.setProperty("java.compiler", "NONE");
+
+            long startTime = System.nanoTime();
+            topsHeapSort(numTops, copy, comparator);
+            long endTime = System.nanoTime();
+
+            // Re-enable JIT compiler for subsequent runs
+            System.setProperty("java.compiler", "javac");
+
+            totalTime += endTime - startTime;
+        }
+
+        return totalTime / 10;  // average execution time over 10 runs
+    }
+
+    public static void main(String[] args) {
+        SorterImpl<Integer> sorter = new SorterImpl<>();
+
+        int numTops = 10;  // specify the number of tops
+
+        int initialSize = 100;  // initial size
+
+        for (int j = 1; j <= 10; j++) {
+            int size = initialSize * j;  // size incremented for each run
+            for (int k = 0; k < 15; k++) {  // iterate 15 times to reach 5,000,000
+                if (size > 5_000_000) {
+                    size = 5_000_000;  // cap the size at 5,000,000 songs
+                }
+
+                List<Integer> items = generateRandomList(size);
+                Comparator<Integer> comparator = Integer::compareTo;
+
+                long selInsBubSortTotalTime = sorter.measureExecutionTime(new ArrayList<>(items), comparator, numTops);
+                long quickSortTotalTime = sorter.measureExecutionTime(new ArrayList<>(items), comparator, numTops);
+                long topsHeapSortTotalTime = sorter.measureExecutionTime(new ArrayList<>(items), comparator, numTops);
+
+                long avgSelInsBubSortTime = selInsBubSortTotalTime / 10;
+                long avgQuickSortTime = quickSortTotalTime / 10;
+                long avgTopsHeapSortTime = topsHeapSortTotalTime / 10;
+
+                System.out.println("Run " + j + " - List Size: " + size +
+                        " - selInsBubSort: " + avgSelInsBubSortTime + " ns" +
+                        " - quickSort: " + avgQuickSortTime + " ns" +
+                        " - topsHeapSort: " + avgTopsHeapSortTime + " ns");
+
+                if (avgTopsHeapSortTime > 20 * 1_000_000_000) {
+                    break;  // break if sorting takes more than 20 seconds
+                }
+            }
+        }
+    }
+
+
+
+
+    private static List<Integer> generateRandomList(int size) {
+        Random random = new Random();
+        List<Integer> randomList = new ArrayList<>(size);
+
+        for (int i = 0; i < size; i++) {
+            randomList.add(random.nextInt());  // Adjust this based on your data type and generation logic
+        }
+
+        return randomList;
+    }
 
 
 

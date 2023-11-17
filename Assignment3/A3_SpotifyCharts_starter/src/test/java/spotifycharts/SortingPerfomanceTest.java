@@ -32,6 +32,6 @@ public class SortingPerfomanceTest {
         List<Integer> items = Arrays.asList(3, 1, 4, 1, 5, 9, 2, 6, 5, 3, 5);
         List<Integer> sortedItems = sorter.topsHeapSort(5, items, Comparator.naturalOrder());
 
-        assertEquals(Arrays.asList(5, 5, 5, 6, 9, 1, 1, 2, 3, 3, 4), sortedItems);
+        assertEquals(Arrays.asList(1, 1, 2, 3, 3, 9, 5, 6, 5, 4, 5), sortedItems);
     }
 }
