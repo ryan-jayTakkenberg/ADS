@@ -18,6 +18,7 @@ class PollingStationTest {
 
     @BeforeEach
     void setup() {
+
         this.party1 = new Party(1,"Party-1");
         this.party2 = new Party(2,"Party-2");
         this.candidate11 = new Candidate("A.", null, "Candidate", this.party1);
@@ -31,6 +32,7 @@ class PollingStationTest {
     }
     @Test
     void addVotesShallRegisterAndAccumulateAllVotesByCandidate() {
+        hva.getVotesByParty();
         assertEquals(VOTES21, hva.getVotes(candidate21));
         hva.addVotes(candidate21, VOTES21);
         assertEquals(2 * VOTES21, hva.getVotes(candidate21));

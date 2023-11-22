@@ -26,12 +26,12 @@ public class Party {
      */
     private Set<Candidate> candidates;
 
-    public Party(int id, String name) {
+    public Party(int id, String name, Candidate...candidates) {
         this.id = id;
         this.name = name;
+        this.candidates = new HashSet<>(Set.of(candidates));
 
         // TODO initialise this.candidates with an appropriate Set implementation
-
 
     }
 
@@ -46,17 +46,21 @@ public class Party {
      *              or otherwise the newCandidate itself
      */
     public Candidate addOrGetCandidate(Candidate newCandidate) {
+        for (Candidate existingCandidate : candidates) {
+            if (existingCandidate.getFullName().equals(newCandidate.getFullName())) {
+                // Candidate with the same name already exists, return the existing instance
+                return existingCandidate;
+            }
+        }
 
-        // associate the new Candidate with this party
+        // No existing candidate found with the same name, add the newCandidate to the set
+        candidates.add(newCandidate);
+
+        // associate the newCandidate with this party
         newCandidate.setParty(this);
 
-        // TODO try to add the newCandidate to the set of candidates,
-        //  and if that fails then return the existing duplicate instance that is in the set already.
+        return newCandidate;
 
-
-
-
-        return null; // replace by a proper outcome
     }
 
     @Override
@@ -73,20 +77,22 @@ public class Party {
         if (!(o instanceof Party)) return false;
         Party other = (Party) o;
 
+
+
+
         // TODO provide the equality criterion to identify unique party instances
 
 
 
-        return false; // replace by a proper outcome
+        return this.id == other.getId() && Objects.equals(this.name, other.getName());
+
     }
 
     @Override
     public int hashCode() {
         // TODO provide a hashCode that is consistent with above equality criterion
 
-
-
-        return 0; // replace by a proper outcome
+        return Objects.hash(this.id + this.name);
     }
 
     public int getId() {

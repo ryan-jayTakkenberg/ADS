@@ -41,10 +41,15 @@ public class Candidate {
         // every candidate shall have a last name
         String fullName = lastName;
 
-        // TODO prepend optional lastNamePrefix and optional firstName
-        //  to compose a unique and nicely formatted full name
+        // prepend optional lastNamePrefix
+        if (lastNamePrefix != null && !lastNamePrefix.isEmpty()) {
+            fullName = lastNamePrefix + " " + fullName;
+        }
 
-
+        // prepend optional firstName
+        if (firstName != null && !firstName.isEmpty()) {
+            fullName = firstName + " " + fullName;
+        }
 
         return fullName;
     }
@@ -56,7 +61,7 @@ public class Candidate {
     @Override
     public String toString() {
         return "Candidate{" +
-                "partyId=" + party.getId() +
+                "partyId=" + (party != null ? party.getId() : "Null") +
                 ",name='" + getFullName() + "'" +
                 "}";
     }
@@ -66,21 +71,18 @@ public class Candidate {
         if (this == o) return true;
         if (!(o instanceof Candidate)) return false;
         Candidate other = (Candidate) o;
-
-        // TODO provide the equality criterion to identify unique candidate instances
-        //  hint: every candidate shall have a unique full name within his/her party.
-
-
-        return false; // replace by a proper outcome
+        return this.getParty().getId() == other.getParty().getId() &&
+                Objects.equals(this.getFullName(), other.getFullName());
     }
 
     @Override
     public int hashCode() {
-        // TODO provide a hashCode that is consistent with above equality criterion
 
+        int partyId = (party != null ? party.getId() : 0);
 
-        return 0; // replace by a proper outcome
+        return Objects.hash(partyId, this.getFullName());
     }
+
 
     public String getFirstName() {
         return firstName;
