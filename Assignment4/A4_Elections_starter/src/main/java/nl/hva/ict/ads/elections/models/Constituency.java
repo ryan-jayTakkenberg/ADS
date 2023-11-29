@@ -37,6 +37,12 @@ public class Constituency {
     public Constituency(int id, String name) {
         this.id = id;
         this.name = name;
+        this.rankedCandidatesByParty = new HashMap<>();
+        this.pollingStations = new TreeSet<>(Comparator.comparing(PollingStation::getZipCode)
+                .thenComparing(PollingStation::getId));
+
+
+
 
         // TODO initialise this.rankedCandidatesByParty with an appropriate Map implementation
         //  and this.pollingStations with an appropriate Set implementation organised by zipCode and Id
@@ -57,8 +63,25 @@ public class Constituency {
         // TODO  register the candidate in this constituency for his/her party at the given rank (ballot position)
         //  hint1: first check if a map of registered candidates already exist for the party of the given candidate
         //        then add the candidate to that map, if the candidate has not been registered before.
+        NavigableMap<Integer, Candidate> candidatesByRank = rankedCandidatesByParty
+                .computeIfAbsent(candidate.getParty(), k -> new TreeMap<>());
 
-        return false;    // replace by a proper outcome
+        // Check if the candidate has not been registered before at the given rank
+        if (!candidatesByRank.containsKey(rank)) {
+            // Check if the candidate has not been registered before at any rank
+            for (NavigableMap<Integer, Candidate> map : rankedCandidatesByParty.values()) {
+                if (map.containsValue(candidate)) {
+                    return false; // Candidate is already registered at another rank
+                }
+            }
+
+            // Register the candidate for the party at the given rank
+            candidatesByRank.put(rank, candidate);
+            return true; // Successfully registered
+        } else {
+            // Candidate has already been registered at the given rank
+            return false; // Registration failed
+        }
     }
 
     /**
