@@ -89,14 +89,18 @@ public class Constituency {
      * @return
      */
     public Collection<Party> getParties() {
-        // TODO: return all parties that have been registered at this constituency
-        //  hint: there is no need to build a new collection; just return what you have got...
-
-
-
-        return null;    // replace by a proper outcome
+        return getCandidatesByParty().keySet();
     }
-
+    /**
+     * Retrieves a map of candidates organized by party.
+     *
+     * @return a map of candidates organized by party.
+     */
+    public Map<Party, List<Candidate>> getCandidatesByParty() {
+        return getRankedCandidatesByParty().entrySet().stream()
+                .collect(Collectors.toMap(Map.Entry::getKey, entry ->
+                        entry.getValue().values().stream().collect(Collectors.toList())));
+    }
     /**
      * retrieves a candidate from the ballot list of given party and at given rank
      * @param party
@@ -104,11 +108,21 @@ public class Constituency {
      * @return
      */
     public Candidate getCandidate(Party party, int rank) {
-        // TODO: return the candidate at the given rank in the given party
+        // Retrieve the candidates for the given party
+        NavigableMap<Integer, Candidate> candidatesByRank = getRankedCandidatesByParty().get(party);
 
+        // Ensure candidates map is not null
+        if (candidatesByRank != null) {
+            // Retrieve the candidate at the given rank
+            return candidatesByRank.get(rank);
+        }
 
-        return null;    // replace by a proper outcome
+        // If the conditions are not met, return null
+        return null;
     }
+
+
+
 
     /**
      * retrieve a list of all registered candidates for a given party in order of their rank
@@ -116,12 +130,7 @@ public class Constituency {
      * @return
      */
     public final List<Candidate> getCandidates(Party party) {
-        // TODO: return a list with all registered candidates of a given party in order of their rank
-        //  hint: if the implementation classes of rankedCandidatesByParty are well chosen, this only takes one line of code
-        //  hint: the resulting list may be immutable at your choice of implementation.
-
-
-        return null; // replace by a proper outcome
+        return getCandidatesByParty().getOrDefault(party, Collections.emptyList());
     }
 
     /**
@@ -130,11 +139,9 @@ public class Constituency {
      * @return the set of all candidates in this Constituency.
      */
     public Set<Candidate> getAllCandidates() {
-        // TODO collect all candidates of all parties of this Constituency into a Set.
-        //  hint: flatMap may help...
-
-
-        return null;    // replace by a proper outcome
+        return getCandidatesByParty().values().stream()
+                .flatMap(List::stream)
+                .collect(Collectors.toSet());
     }
 
     /**
@@ -146,11 +153,13 @@ public class Constituency {
      * @return      the sub set of polling stations within the specified zipCode range
      */
     public NavigableSet<PollingStation> getPollingStationsByZipCodeRange(String firstZipCode, String lastZipCode) {
-        // TODO: return all polling stations that have been registered at this constituency
-        //  hint: there is no need to build a new collection; just return what you have got...
+        return getPollingStations().stream()
+                .filter(station -> isWithinZipCodeRange(station.getZipCode(), firstZipCode, lastZipCode))
+                .collect(Collectors.toCollection(() -> new TreeSet<>(Comparator.comparing(PollingStation::getZipCode))));
+    }
 
-
-        return null; // replace by a proper outcome
+    private boolean isWithinZipCodeRange(String zipCode, String firstZipCode, String lastZipCode) {
+        return zipCode.compareTo(firstZipCode) >= 0 && zipCode.compareTo(lastZipCode) <= 0;
     }
 
     /**
@@ -158,11 +167,12 @@ public class Constituency {
      * accumulated across all polling stations and all candidates
      * @return
      */
-    public Map<Party,Integer> getVotesByParty() {
-        // TODO prepare a map of total number of votes per party
-
-
-        return null; // replace by a proper outcome
+    public Map<Party, Integer> getVotesByParty() {
+        Map<Party, Integer> votesByParty = new HashMap<>();
+        getPollingStations().forEach(station ->
+                station.getVotesByCandidate().forEach((candidate, votes) ->
+                        votesByParty.merge(candidate.getParty(), votes, Integer::sum)));
+        return votesByParty;
     }
 
     /**
