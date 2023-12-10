@@ -61,21 +61,29 @@ public class Election {
      * @return alle unique candidates organised by increasing party-id
      */
     public List<Candidate> getAllCandidates() {
-        List<Candidate> allCandidates = new ArrayList<>();
+        Map<Integer, Set<Candidate>> candidatesByPartyId = new TreeMap<>();
 
         // Iterate over all constituencies
         for (Constituency constituency : getConstituencies()) {
             // Iterate over all parties in the constituency
             for (Party party : constituency.getParties()) {
-                // Add all candidates of the party to the result list
-                allCandidates.addAll(party.getCandidates());
+                // Iterate over all candidates in the party
+                for (Candidate candidate : party.getCandidates()) {
+                    // Get the party ID
+                    int partyId = party.getId();
+
+                    // Add the candidate to the corresponding set in the map
+                    candidatesByPartyId
+                            .computeIfAbsent(partyId, k -> new HashSet<>())
+                            .add(candidate);
+                }
             }
         }
 
-        // Sort candidates by increasing party ID
-        allCandidates.sort(Comparator.comparingInt(candidate -> candidate.getParty().getId()));
-
-        return allCandidates;
+        // Flatten the sets into a single list, ordered by party ID
+        return candidatesByPartyId.values().stream()
+                .flatMap(Set::stream)
+                .collect(Collectors.toList());
     }
 
     /**
@@ -100,18 +108,13 @@ public class Election {
         return registrationsByConstituency;
     }
     /**
-     * Finds all Candidates that have a duplicate name against another candidate in the election
-     * (can be in the same party or in another party)
-     * @return
-     */
-    /**
      * Get candidates with duplicate names.
      *
      * @return Set of candidates with duplicate names.
      */
     public Set<Candidate> getCandidatesWithDuplicateNames() {
         Set<Candidate> candidatesWithDuplicateNames = new HashSet<>();
-        Map<String, Integer> nameOccurrences = new HashMap<>();
+        Set<String> seenNames = new HashSet<>();
 
         // Iterate over all constituencies
         for (Constituency constituency : getConstituencies()) {
@@ -122,24 +125,45 @@ public class Election {
                     // Get the trimmed full name of the candidate
                     String fullName = candidate.getFullName().trim();
 
-                    // Count the occurrences of the name
-                    int occurrences = nameOccurrences.getOrDefault(fullName, 0);
-                    nameOccurrences.put(fullName, occurrences + 1);
-
-                    // Check if this is the second occurrence (duplicate)
-                    if (occurrences == 1) {
+                    // Check if the name is already seen (duplicate)
+                    if (seenNames.contains(fullName)) {
                         candidatesWithDuplicateNames.add(candidate);
+                    } else {
+                        // Add the name to the seen names set
+                        seenNames.add(fullName);
                     }
                 }
             }
         }
 
         // Print debug information
-        System.out.println("Total candidates: " + nameOccurrences.size());
+        System.out.println("Total candidates: " + getTotalCandidates());
         System.out.println("Candidates with duplicate names: " + candidatesWithDuplicateNames.size());
+
 
         return candidatesWithDuplicateNames;
     }
+
+    /**
+     * Get total candidates in all constituencies and parties.
+     *
+     * @return Total number of candidates.
+     */
+    private int getTotalCandidates() {
+        int totalCandidates = 0;
+
+        // Iterate over all constituencies
+        for (Constituency constituency : getConstituencies()) {
+            // Iterate over all parties in the constituency
+            for (Party party : constituency.getParties()) {
+                // Add the number of candidates in the party to the total
+                totalCandidates += party.getCandidates().size();
+            }
+        }
+
+        return totalCandidates;
+    }
+
 
     /**
      * Retrieve from all constituencies the combined sub set of all polling stations that are located within the area of the specified zip codes
