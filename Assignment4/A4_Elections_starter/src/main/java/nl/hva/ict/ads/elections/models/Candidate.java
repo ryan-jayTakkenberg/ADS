@@ -75,6 +75,7 @@ public class Candidate {
                 Objects.equals(this.getFullName(), other.getFullName());
     }
 
+
     @Override
     public int hashCode() {
 

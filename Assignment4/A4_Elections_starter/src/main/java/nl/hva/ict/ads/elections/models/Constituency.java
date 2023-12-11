@@ -60,27 +60,20 @@ public class Constituency {
      * @return whether the registration has succeeded
      */
     public boolean register(int rank, Candidate candidate) {
-        // TODO  register the candidate in this constituency for his/her party at the given rank (ballot position)
-        //  hint1: first check if a map of registered candidates already exist for the party of the given candidate
-        //        then add the candidate to that map, if the candidate has not been registered before.
         NavigableMap<Integer, Candidate> candidatesByRank = rankedCandidatesByParty
                 .computeIfAbsent(candidate.getParty(), k -> new TreeMap<>());
 
+        // Check if the candidate has not been registered before at any rank
+        if (rankedCandidatesByParty.values().stream().anyMatch(map -> map.containsValue(candidate))) {
+            return false; // Candidate is already registered at another rank
+        }
+
         // Check if the candidate has not been registered before at the given rank
         if (!candidatesByRank.containsKey(rank)) {
-            // Check if the candidate has not been registered before at any rank
-            for (NavigableMap<Integer, Candidate> map : rankedCandidatesByParty.values()) {
-                if (map.containsValue(candidate)) {
-                    return false; // Candidate is already registered at another rank
-                }
-            }
-
-            // Register the candidate for the party at the given rank
             candidatesByRank.put(rank, candidate);
             return true; // Successfully registered
         } else {
-            // Candidate has already been registered at the given rank
-            return false; // Registration failed
+            return false; // Candidate has already been registered at the given rank
         }
     }
 

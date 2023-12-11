@@ -95,54 +95,72 @@ public class Election {
     public Map<Constituency, Integer> numberOfRegistrationsByConstituency(Party party) {
         Map<Constituency, Integer> registrationsByConstituency = new HashMap<>();
 
-        // Iterate over all constituencies
+        // Iterating over all constituencies
         for (Constituency constituency : getConstituencies()) {
-            // Count the number of candidates from the specified party in each constituency
-            long count = party.getCandidates().stream()
-                    .filter(candidate -> candidate.getParty().equals(constituency))
+            // Counting the number of candidates from the specified party in each constituency
+            long count = constituency.getCandidates(party).stream()
+                    .filter(candidate -> candidate.getParty().equals(party))
                     .count();
+
+            // Logging the intermediate count for debugging
+            System.out.println("Constituency " + constituency.getName() + " - Party " + party.getName() + ": " + count);
 
             registrationsByConstituency.put(constituency, (int) count);
         }
 
         return registrationsByConstituency;
     }
+
+
+
     /**
      * Get candidates with duplicate names.
      *
      * @return Set of candidates with duplicate names.
      */
+
+
     public Set<Candidate> getCandidatesWithDuplicateNames() {
-        Set<Candidate> candidatesWithDuplicateNames = new HashSet<>();
-        Set<String> seenNames = new HashSet<>();
+        // Map to count the occurrences of each full name
+        Map<String, Integer> nameCount = new HashMap<>();
 
-        // Iterate over all constituencies
-        for (Constituency constituency : getConstituencies()) {
-            // Iterate over all parties in the constituency
-            for (Party party : constituency.getParties()) {
-                // Iterate over all candidates in the party
-                for (Candidate candidate : party.getCandidates()) {
-                    // Get the trimmed full name of the candidate
-                    String fullName = candidate.getFullName().trim();
+        // Set to store all unique candidates
+        Set<Candidate> allCandidates = new HashSet<>();
 
-                    // Check if the name is already seen (duplicate)
-                    if (seenNames.contains(fullName)) {
-                        candidatesWithDuplicateNames.add(candidate);
-                    } else {
-                        // Add the name to the seen names set
-                        seenNames.add(fullName);
-                    }
-                }
+        // Loop to gather all unique candidates
+        for (Constituency constituency : constituencies) {
+            allCandidates.addAll(constituency.getAllCandidates());
+        }
+
+        // count the names
+        for (Candidate candidate : allCandidates) {
+            String fullName = candidate.getFullName();
+            nameCount.put(fullName, nameCount.getOrDefault(fullName, 0) + 1);
+        }
+
+        // store the duplicates
+        Set<Candidate> duplicates = new HashSet<>();
+
+        // Find candidates whose name show op more than ones
+        for (Candidate candidate : allCandidates) {
+            if (nameCount.get(candidate.getFullName()) > 1) {
+                duplicates.add(candidate);
             }
         }
 
         // Print debug information
         System.out.println("Total candidates: " + getTotalCandidates());
-        System.out.println("Candidates with duplicate names: " + candidatesWithDuplicateNames.size());
+        System.out.println("Candidates with duplicate names: " + duplicates.size());
 
-
-        return candidatesWithDuplicateNames;
+        return duplicates;
     }
+
+
+
+
+
+
+
 
     /**
      * Get total candidates in all constituencies and parties.
