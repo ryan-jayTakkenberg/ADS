@@ -302,7 +302,6 @@ public class Election {
         return integers.stream().reduce(Integer::sum).orElse(0);
     }
 
-
     public String prepareSummary(int partyId) {
         Party party = getParty(partyId);
         StringBuilder summary = new StringBuilder()
@@ -317,14 +316,19 @@ public class Election {
         party.getCandidates().forEach(candidate -> summary.append(candidate).append("\n"));
 
         // Total number of registrations for the given party
-        int totalRegistrations = party.getId();
+        int totalRegistrations = party.getCandidates().size();
         summary.append("Total number of registrations: ").append(totalRegistrations).append("\n");
 
         // Map of number of registrations by constituency for the given party
-        Map<Constituency, Integer> registrationsByConstituency = (Map<Constituency, Integer>) party.getCandidates();
+        Map<String, Integer> registrationsByConstituency = new HashMap<>();
+        party.getCandidates().forEach(candidate -> {
+            String constituencyName = "UnknownConstituency"; // Replace with your logic to get Constituency name based on partyId
+            registrationsByConstituency.put(constituencyName, registrationsByConstituency.getOrDefault(constituencyName, 0) + 1);
+        });
+
         summary.append("Registrations by constituency:\n");
-        registrationsByConstituency.forEach((constituency, registrations) ->
-                summary.append(constituency.getName()).append(": ").append(registrations).append("\n"));
+        registrationsByConstituency.forEach((constituencyName, registrations) ->
+                summary.append(constituencyName).append(": ").append(registrations).append("\n"));
 
         return summary.toString();
     }
