@@ -1,5 +1,8 @@
 package maze_escape;
 
+import maze_escape.AbstractGraph;
+import maze_escape.Continent;
+import maze_escape.Country;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -31,11 +31,21 @@ public abstract class AbstractGraph<V> {
      * @return
      */
     public Set<V> getAllVertices(V firstVertex) {
-        // TODO calculate recursively the set of all connected vertices that can be reached from the given start vertex
-        //  hint: reuse getNeighbours()
+        Set<V> visitedVertices = new HashSet<>();
+        Set<V> allVertices = new HashSet<>();
+        getAllVerticesRecursive(firstVertex, visitedVertices, allVertices);
+        return allVertices;
+    }
 
-
-        return null;    // replace by a proper outcome
+    private void getAllVerticesRecursive(V currentVertex, Set<V> visitedVertices, Set<V> allVertices) {
+        if (!visitedVertices.contains(currentVertex)) {
+            visitedVertices.add(currentVertex);
+            allVertices.add(currentVertex);
+            Set<V> neighbours = getNeighbours(currentVertex);
+            for (V neighbour : neighbours) {
+                getAllVerticesRecursive(neighbour, visitedVertices, allVertices);
+            }
+        }
     }
 
 
@@ -53,17 +63,43 @@ public abstract class AbstractGraph<V> {
      */
     public String formatAdjacencyList(V firstVertex) {
         StringBuilder stringBuilder = new StringBuilder("Graph adjacency list:\n");
-
-        // TODO recursively build the adjacency list including all vertices that can be reached from firstVertex
-        //  following a recursive pre-order traversal of a spanning tree
-        //  using the above stringBuilder to format the list
-        //  hint: use the getNeighbours() method to retrieve the roots of the child subtrees.
-
-
-
-        // return the result
+        Set<V> visitedVertices = new HashSet<>();
+        formatAdjacencyListRecursive(firstVertex, visitedVertices, stringBuilder);
         return stringBuilder.toString();
     }
+
+    private void formatAdjacencyListRecursive(V currentVertex, Set<V> visitedVertices, StringBuilder stringBuilder) {
+        if (!visitedVertices.contains(currentVertex)) {
+            visitedVertices.add(currentVertex);
+
+            // Get neighbors in the desired order (assumed order: alphabetical)
+            List<V> neighbours = getNeighbours(currentVertex).stream()
+                    .sorted(Comparator.comparing(Object::toString))
+                    .collect(Collectors.toList());
+
+            // Append the current vertex to the StringBuilder
+            stringBuilder.append(currentVertex).append(": [");
+
+            // Append the neighbors of the current vertex
+            for (V neighbour : neighbours) {
+                stringBuilder.append(neighbour).append(",");
+            }
+
+            // Remove the trailing comma if there are neighbors
+            if (!neighbours.isEmpty()) {
+                stringBuilder.deleteCharAt(stringBuilder.length() - 1);
+            }
+
+            // Close the list
+            stringBuilder.append("]\n");
+
+            // Recursively call for each neighbor
+            for (V neighbour : neighbours) {
+                formatAdjacencyListRecursive(neighbour, visitedVertices, stringBuilder);
+            }
+        }
+    }
+
 
 
     /**
@@ -130,6 +166,27 @@ public abstract class AbstractGraph<V> {
         }
 
         public Set<V> getVisited() { return this.visited; }
+
+        public void setVertices(Deque<V> vertices) {
+            this.vertices = vertices;
+        }
+
+        public void setTotalWeight(double totalWeight) {
+            this.totalWeight = totalWeight;
+        }
+
+        public void setVisited(Set<V> visited) {
+            this.visited = visited;
+        }
+
+        public void addVertex(V vertex) {
+            vertices.addLast(vertex);
+        }
+        public void removeLastVertex() {
+            if (!vertices.isEmpty()) {
+                vertices.removeLast();
+            }
+        }
     }
 
     /**
@@ -141,14 +198,46 @@ public abstract class AbstractGraph<V> {
      *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
      */
     public GPath depthFirstSearch(V startVertex, V targetVertex) {
+        if (startVertex == null || targetVertex == null) {
+            return null;
+        }
 
-        if (startVertex == null || targetVertex == null) return null;
+        Set<V> visitedVertices = new HashSet<>();
+        GPath path = new GPath();
 
-        // TODO calculate the path from start to target by recursive depth-first-search
+        if (startVertex.equals(targetVertex)) {
+            path.addVertex(startVertex);
+            path.visited.add(startVertex);
+            return path;
+        }
 
+        if (depthFirstSearchRecursive(startVertex, targetVertex, visitedVertices, path)) {
+            return path;
+        } else {
+            return null;
+        }
+    }
 
+    private boolean depthFirstSearchRecursive(V currentVertex, V targetVertex, Set<V> visitedVertices, GPath path) {
+        visitedVertices.add(currentVertex);
+        path.addVertex(currentVertex);
 
-        return null;    // replace by a proper outcome, if any
+        if (currentVertex.equals(targetVertex)) {
+            return true; // Target vertex found
+        }
+
+        Set<V> neighbours = getNeighbours(currentVertex);
+        for (V neighbour : neighbours) {
+            if (!visitedVertices.contains(neighbour)) {
+                if (depthFirstSearchRecursive(neighbour, targetVertex, visitedVertices, path)) {
+                    return true; // Target vertex found in the subtree
+                }
+            }
+        }
+
+        // If the target vertex is not found in this subtree, backtrack
+        path.removeLastVertex();
+        return false;
     }
 
 
@@ -161,16 +250,41 @@ public abstract class AbstractGraph<V> {
      *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
      */
     public GPath breadthFirstSearch(V startVertex, V targetVertex) {
+        if (startVertex == null || targetVertex == null) {
+            return null;
+        }
 
-        if (startVertex == null || targetVertex == null) return null;
+        Set<V> visitedVertices = new HashSet<>();
+        GPath path = new GPath();
 
-        // TODO calculate the path from start to target by breadth-first-search
+        if (startVertex.equals(targetVertex)) {
+            path.addVertex(startVertex);
+            path.visited.add(startVertex);
+            return path;
+        }
 
+        Queue<V> queue = new LinkedList<>();
+        queue.add(startVertex);
+        visitedVertices.add(startVertex);
 
+        while (!queue.isEmpty()) {
+            V currentVertex = queue.poll();
+            path.addVertex(currentVertex);
 
+            if (currentVertex.equals(targetVertex)) {
+                return path; // Target vertex found
+            }
 
+            Set<V> neighbours = getNeighbours(currentVertex);
+            for (V neighbour : neighbours) {
+                if (!visitedVertices.contains(neighbour)) {
+                    visitedVertices.add(neighbour);
+                    queue.add(neighbour);
+                }
+            }
+        }
 
-        return null;    // replace by a proper outcome, if any
+        return null; // Target vertex not found
     }
 
     // helper class to build the spanning tree of visited vertices in dijkstra's shortest path algorithm
@@ -203,53 +317,85 @@ public abstract class AbstractGraph<V> {
      *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
      */
     public GPath dijkstraShortestPath(V startVertex, V targetVertex,
-                                      BiFunction<V,V,Double> weightMapper) {
+                                         BiFunction<V,V,Double> weightMapper) {
 
         if (startVertex == null || targetVertex == null) return null;
 
-        // initialise the result path of the search
+        // Initialise the result path of the search
         GPath path = new GPath();
         path.visited.add(startVertex);
 
-        // easy target
+        // Easy target
         if (startVertex.equals(targetVertex)) {
             path.vertices.add(startVertex);
             return path;
         }
 
-        // a minimum spanning tree which tracks for every visited vertex:
-        //   a) its (parent) predecessor in the currently shortest path towards this visited vertex
-        //   b) the total weight of the currently shortest path towards this visited vertex
-        //   c) a mark, indicating whether the current path towards this visited vertex is the final shortest.
-        // (you may choose a different approach of tracking the MST of the algorithm, if you wish)
+        // A minimum spanning tree which tracks for every visited vertex:
+        // a) Its (parent) predecessor in the currently shortest path towards this visited vertex
+        // b) The total weight of the currently shortest path towards this visited vertex
+        // c) A mark, indicating whether the current path towards this visited vertex is the final shortest.
         Map<V, MSTNode> minimumSpanningTree = new HashMap<>();
 
-        // initialise the minimum spanning tree with the startVertex
+        // Initialise the minimum spanning tree with the startVertex
         MSTNode nearestMSTNode = new MSTNode(startVertex);
         nearestMSTNode.weightSumTo = 0.0;
         minimumSpanningTree.put(startVertex, nearestMSTNode);
 
-        // TODO maybe more helper variables or data structures, if needed
+        // Priority queue to keep track of the nearest MSTNode
+        PriorityQueue<MSTNode> priorityQueue = new PriorityQueue<>();
+        priorityQueue.add(nearestMSTNode);
 
+        while (!priorityQueue.isEmpty()) {
+            // Dequeue the nearest MSTNode
+            nearestMSTNode = priorityQueue.poll();
 
+            // Mark the current node as final
+            nearestMSTNode.marked = true;
 
-        while (nearestMSTNode != null) {
+            // TODO: Register the visited vertex for statistical purposes
+            path.visited.add(nearestMSTNode.vertex);
 
-            // TODO continue Dijkstra's algorithm to process nearestMSTNode
-            //  mark nodes as you find their current shortest path to be final
-            //  if you hit the target: complete the path and bail out !!!
-            //  register all visited vertices for statistical purposes
+            // Continue Dijkstra's algorithm to process nearestMSTNode
+            Set<V> neighbours = getNeighbours(nearestMSTNode.vertex);
 
+            for (V neighbour : neighbours) {
+                // Skip if the neighbour is already marked as final
+                if (minimumSpanningTree.containsKey(neighbour) && minimumSpanningTree.get(neighbour).marked) {
+                    continue;
+                }
 
+                // Calculate the potential new total weight
+                double potentialWeight = nearestMSTNode.weightSumTo + weightMapper.apply(nearestMSTNode.vertex, neighbour);
 
+                // Update the minimum spanning tree if a shorter path is found
+                MSTNode neighbourMSTNode = minimumSpanningTree.get(neighbour);
+                if (neighbourMSTNode == null || potentialWeight < neighbourMSTNode.weightSumTo) {
+                    neighbourMSTNode = new MSTNode(neighbour);
+                    neighbourMSTNode.parentVertex = nearestMSTNode.vertex;
+                    neighbourMSTNode.weightSumTo = potentialWeight;
 
+                    // Enqueue the updated MSTNode
+                    priorityQueue.add(neighbourMSTNode);
+                    minimumSpanningTree.put(neighbour, neighbourMSTNode);
+                }
+            }
 
-
-            // TODO find the next nearest MSTNode that is not marked yet
-            nearestMSTNode = null;      // replace by a proper selection
+            if (nearestMSTNode.vertex.equals(targetVertex)) {
+                // Target vertex found, construct the path and return
+                while (nearestMSTNode != null) {
+                    path.vertices.addFirst(nearestMSTNode.vertex);
+                    nearestMSTNode = minimumSpanningTree.get(nearestMSTNode.parentVertex);
+                }
+                path.reCalculateTotalWeight(weightMapper);
+                return path;
+            }
         }
 
-
-        return null;        // replace by a proper outcome, if any
+        return null; // No path found
     }
+
+
+
+
 }
