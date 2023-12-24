@@ -61,28 +61,10 @@ public class Election {
      * @return alle unique candidates organised by increasing party-id
      */
     public List<Candidate> getAllCandidates() {
-        Map<Integer, Set<Candidate>> candidatesByPartyId = new TreeMap<>();
-
-        // Iterate over all constituencies
-        for (Constituency constituency : getConstituencies()) {
-            // Iterate over all parties in the constituency
-            for (Party party : constituency.getParties()) {
-                // Iterate over all candidates in the party
-                for (Candidate candidate : party.getCandidates()) {
-                    // Get the party ID
-                    int partyId = party.getId();
-
-                    // Add the candidate to the corresponding set in the map
-                    candidatesByPartyId
-                            .computeIfAbsent(partyId, k -> new HashSet<>())
-                            .add(candidate);
-                }
-            }
-        }
-
-        // Flatten the sets into a single list, ordered by party ID
-        return candidatesByPartyId.values().stream()
-                .flatMap(Set::stream)
+        return getConstituencies().stream()
+                .flatMap(constituency -> constituency.getParties().stream())
+                .flatMap(party -> party.getCandidates().stream())
+                .distinct()  // Ensure uniqueness based on equals() and hashCode()
                 .collect(Collectors.toList());
     }
 
@@ -93,22 +75,13 @@ public class Election {
      */
 
     public Map<Constituency, Integer> numberOfRegistrationsByConstituency(Party party) {
-        Map<Constituency, Integer> registrationsByConstituency = new HashMap<>();
-
-        // Iterating over all constituencies
-        for (Constituency constituency : getConstituencies()) {
-            // Counting the number of candidates from the specified party in each constituency
-            long count = constituency.getCandidates(party).stream()
-                    .filter(candidate -> candidate.getParty().equals(party))
-                    .count();
-
-            // Logging the intermediate count for debugging
-            System.out.println("Constituency " + constituency.getName() + " - Party " + party.getName() + ": " + count);
-
-            registrationsByConstituency.put(constituency, (int) count);
-        }
-
-        return registrationsByConstituency;
+        return getConstituencies().stream()
+                .collect(Collectors.toMap(
+                        constituency -> constituency,
+                        constituency -> (int) constituency.getCandidates(party).stream()
+                                .filter(candidate -> candidate.getParty().equals(party))
+                                .count()
+                ));
     }
 
 

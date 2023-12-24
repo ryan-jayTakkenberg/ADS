@@ -69,12 +69,19 @@ public class Constituency {
         }
 
         // Check if the candidate has not been registered before at the given rank
-        if (!candidatesByRank.containsKey(rank)) {
-            candidatesByRank.put(rank, candidate);
-            return true; // Successfully registered
-        } else {
+        if (candidatesByRank.containsKey(rank)) {
             return false; // Candidate has already been registered at the given rank
         }
+
+        // Use subMap to check if the rank is taken by another Candidate
+        NavigableMap<Integer, Candidate> subMap = candidatesByRank.subMap(rank, true, rank, true);
+        if (!subMap.isEmpty()) {
+            return false; // Rank is already taken by another Candidate
+        }
+
+        // Register the candidate at the given rank
+        candidatesByRank.put(rank, candidate);
+        return true; // Successfully registered
     }
 
     /**

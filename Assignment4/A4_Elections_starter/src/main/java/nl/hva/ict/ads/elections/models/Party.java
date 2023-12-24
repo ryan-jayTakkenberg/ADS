@@ -46,20 +46,14 @@ public class Party {
      *              or otherwise the newCandidate itself
      */
     public Candidate addOrGetCandidate(Candidate newCandidate) {
-        for (Candidate existingCandidate : candidates) {
-            if (existingCandidate.getFullName().equals(newCandidate.getFullName())) {
-                // Candidate with the same name already exists, return the existing instance
-                return existingCandidate;
-            }
-        }
-
-        // No existing candidate found with the same name, add the newCandidate to the set
-        candidates.add(newCandidate);
-
-        // associate the newCandidate with this party
-        newCandidate.setParty(this);
-
-        return newCandidate;
+        return candidates.stream()
+                .filter(candidate -> candidate.getFullName().equals(newCandidate.getFullName()))
+                .findFirst()
+                .orElseGet(() -> {
+                    candidates.add(newCandidate);
+                    newCandidate.setParty(this);
+                    return newCandidate;
+                });
 
     }
 
