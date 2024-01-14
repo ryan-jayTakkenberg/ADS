@@ -246,39 +246,60 @@ public abstract class AbstractGraph<V> {
      *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
      */
     public GPath breadthFirstSearch(V startVertex, V targetVertex) {
-        if (startVertex == null || targetVertex == null) {
-            return null;
-        }
+        // Check if start or target vertices are null, return null if so
+        if (startVertex == null || targetVertex == null) return null;
 
-        Set<V> visitedVertices = new HashSet<>();
-        GPath path = new GPath();
+        // Map to store the previous vertex in the shortest path
+        Map<V, V> prev = new HashMap<>();
 
+        // Set to store visited vertices
+        Set<V> visited = new HashSet<>();
+
+        // Queue for BFS traversal
         Queue<V> queue = new LinkedList<>();
+
+        // Initialize with the start vertex
         queue.add(startVertex);
-        visitedVertices.add(startVertex);
+        visited.add(startVertex);
+        prev.put(startVertex, null);
 
+        // Perform BFS
         while (!queue.isEmpty()) {
-            V currentVertex = queue.poll();
-            path.addVertex(currentVertex);
+            // Get the current vertex from the queue
+            V current = queue.poll();
 
-            if (currentVertex.equals(targetVertex)) {
-                path.visited.addAll(visitedVertices);
-                return path; // Target vertex found
+            // Check if the current vertex is the target vertex
+            if (current.equals(targetVertex)) {
+                // Construct the path if the target vertex is reached
+                GPath path = new GPath();
+                path.visited = visited; // Record visited vertices
+                Deque<V> pathVertices = new LinkedList<>();
+
+                // Reconstruct the path from the target to the start
+                for (V vertex = targetVertex; vertex != null; vertex = prev.get(vertex)) {
+                    pathVertices.addFirst(vertex);
+                }
+
+                // Set the path vertices
+                path.vertices = pathVertices;
+                return path; // Return the found path
             }
 
-            Set<V> neighbours = getNeighbours(currentVertex);
-            for (V neighbour : neighbours) {
-                if (!visitedVertices.contains(neighbour)) {
-                    visitedVertices.add(neighbour);
-                    queue.add(neighbour);
+            // Explore neighbors of the current vertex
+            for (V neighbor : getNeighbours(current)) {
+                if (!visited.contains(neighbor)) {
+                    // Mark the neighbor as visited, set the current vertex as the previous
+                    visited.add(neighbor);
+                    prev.put(neighbor, current);
+
+                    // Enqueue the neighbor for further exploration
+                    queue.add(neighbor);
                 }
             }
         }
 
-        return null; // Target vertex not found
+        return null; // Target vertex not found or path not found
     }
-
-
 
     // helper class to build the spanning tree of visited vertices in dijkstra's shortest path algorithm
     // your may change this class or delete it altogether follow a different approach in your implementation

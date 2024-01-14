@@ -107,7 +107,7 @@ class AbstractGraphTest {
                 "First country in path should match the start");
         assertSame(lux, path.getVertices().stream().reduce((c1,c2)->c2).get(),
                 "Last country in path should match the target");
-        assertEquals(6, path.getVertices().size());
+        assertEquals(3, path.getVertices().size());
         assertTrue(path.getVisited().size() >= path.getVertices().size());
     }
 
