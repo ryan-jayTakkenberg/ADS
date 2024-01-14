@@ -31,6 +31,21 @@ public class Election {
         this.parties = new HashMap<>();
         this.constituencies = new HashSet<>();
     }
+    /**
+     * Add a constituency to the election.
+     * @param constituency The constituency to add.
+     */
+    public void addConstituency(Constituency constituency) {
+        this.constituencies.add(constituency);
+    }
+
+    /**
+     * Add a set of parties to the election.
+     * @param newParties The set of parties to add.
+     */
+    public void addParties(Set<Party> newParties) {
+        newParties.forEach(party -> this.parties.put(party.getId(), party));
+    }
 
     /**
      * finds all (unique) parties registered for this election

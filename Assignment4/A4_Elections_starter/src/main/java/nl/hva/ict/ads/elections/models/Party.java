@@ -31,7 +31,6 @@ public class Party {
         this.name = name;
         this.candidates = new HashSet<>(Set.of(candidates));
 
-        // TODO initialise this.candidates with an appropriate Set implementation
 
     }
 
