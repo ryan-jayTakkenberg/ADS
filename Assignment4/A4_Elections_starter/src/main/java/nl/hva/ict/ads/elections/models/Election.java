@@ -443,5 +443,7 @@ public class Election {
      *              apply a mapMulti that drops unique names but keeps the duplicates
      *              this approach probably requires complex lambda expressions that are difficult to justify
      */
-
+    public void setParties(Map<Integer, Party> parties) {
+        this.parties = parties;
+    }
 }
