@@ -6,6 +6,7 @@ import java.util.stream.Collectors;
 
 public abstract class AbstractGraph<V> {
 
+
     /** Graph representation:
      *  this class implements graph search algorithms on a graph with abstract vertex type V
      *  for every vertex in the graph, its neighbours can be found by use of abstract method getNeighbours(fromVertex)
@@ -72,10 +73,8 @@ public abstract class AbstractGraph<V> {
         if (!visitedVertices.contains(currentVertex)) {
             visitedVertices.add(currentVertex);
 
-            // Get neighbors in the desired order (assumed order: alphabetical)
-            List<V> neighbours = getNeighbours(currentVertex).stream()
-                    .sorted(Comparator.comparing(Object::toString))
-                    .collect(Collectors.toList());
+            // Get neighbors in the desired order (assumed order: order returned by getNeighbours)
+            List<V> neighbours = new ArrayList<>(getNeighbours(currentVertex));
 
             // Append the current vertex to the StringBuilder
             stringBuilder.append(currentVertex).append(": [");
@@ -99,6 +98,7 @@ public abstract class AbstractGraph<V> {
             }
         }
     }
+
 
 
 
@@ -205,12 +205,6 @@ public abstract class AbstractGraph<V> {
         Set<V> visitedVertices = new HashSet<>();
         GPath path = new GPath();
 
-        if (startVertex.equals(targetVertex)) {
-            path.addVertex(startVertex);
-            path.visited.add(startVertex);
-            return path;
-        }
-
         if (depthFirstSearchRecursive(startVertex, targetVertex, visitedVertices, path)) {
             return path;
         } else {
@@ -223,22 +217,24 @@ public abstract class AbstractGraph<V> {
         path.addVertex(currentVertex);
 
         if (currentVertex.equals(targetVertex)) {
-            return true; // Target vertex found
+            path.visited.addAll(visitedVertices);
+            return true;
         }
 
-        Set<V> neighbours = getNeighbours(currentVertex);
-        for (V neighbour : neighbours) {
-            if (!visitedVertices.contains(neighbour)) {
-                if (depthFirstSearchRecursive(neighbour, targetVertex, visitedVertices, path)) {
-                    return true; // Target vertex found in the subtree
+        for (V neighbor : getNeighbours(currentVertex)) {
+            if (!visitedVertices.contains(neighbor)) {
+                if (depthFirstSearchRecursive(neighbor, targetVertex, visitedVertices, path)) {
+                    return true;
                 }
             }
         }
 
-        // If the target vertex is not found in this subtree, backtrack
+        // Backtrack if the target is not reached from this path
+        visitedVertices.remove(currentVertex);
         path.removeLastVertex();
         return false;
     }
+
 
 
     /**
@@ -257,12 +253,6 @@ public abstract class AbstractGraph<V> {
         Set<V> visitedVertices = new HashSet<>();
         GPath path = new GPath();
 
-        if (startVertex.equals(targetVertex)) {
-            path.addVertex(startVertex);
-            path.visited.add(startVertex);
-            return path;
-        }
-
         Queue<V> queue = new LinkedList<>();
         queue.add(startVertex);
         visitedVertices.add(startVertex);
@@ -272,6 +262,7 @@ public abstract class AbstractGraph<V> {
             path.addVertex(currentVertex);
 
             if (currentVertex.equals(targetVertex)) {
+                path.visited.addAll(visitedVertices);
                 return path; // Target vertex found
             }
 
@@ -286,6 +277,8 @@ public abstract class AbstractGraph<V> {
 
         return null; // Target vertex not found
     }
+
+
 
     // helper class to build the spanning tree of visited vertices in dijkstra's shortest path algorithm
     // your may change this class or delete it altogether follow a different approach in your implementation
