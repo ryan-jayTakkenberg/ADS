@@ -26,12 +26,12 @@ public class PrimMazeEscapeMain {
 
         System.out.printf("Maze-Graph contains %d connected vertices in %d cells\n",
                 vertices.size(), maze.getNumberOfCells());
-        //System.out.println(maze.formatAdjacencyList(maze.getStartNode()));
+       // System.out.println(maze.formatAdjacencyList(maze.getStartNode()));
 
-        doPathSearches(maze, "Depth First Search", maze::depthFirstSearch, vertices);
+        //doPathSearches(maze, "Depth First Search", maze::depthFirstSearch, vertices);
         doPathSearches(maze, "Breadth First Search", maze::breadthFirstSearch, vertices);
         doPathSearches(maze, "Dijkstra Shortest Path",
-                (v1,v2)-> maze.dijkstraShortestPath(v1,v2,maze::manhattanTime), vertices);
+              (v1,v2)-> maze.dijkstraShortestPath(v1,v2,maze::manhattanTime), vertices);
 
     }
 
