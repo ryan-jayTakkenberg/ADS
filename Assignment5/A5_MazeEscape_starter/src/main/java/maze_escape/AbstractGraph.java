@@ -189,14 +189,33 @@ public abstract class AbstractGraph<V> {
         }
     }
 
-    /**
-     * Uses a depth-first search algorithm to find a path from the startVertex to targetVertex in the subgraph
-     * All vertices that are being visited by the search should also be registered in path.visited
-     * @param startVertex
-     * @param targetVertex
-     * @return  the path from startVertex to targetVertex
-     *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
-     */
+    private boolean depthFirstSearchIterative(V startVertex, V targetVertex, Set<V> visitedVertices, GPath path) {
+        Stack<V> stack = new Stack<>();
+        stack.push(startVertex);
+
+        while (!stack.isEmpty()) {
+            V currentVertex = stack.pop();
+
+            if (!visitedVertices.contains(currentVertex)) {
+                visitedVertices.add(currentVertex);
+                path.addVertex(currentVertex);
+
+                if (currentVertex.equals(targetVertex)) {
+                    path.visited.addAll(visitedVertices);
+                    return true;
+                }
+
+                for (V neighbor : getNeighbours(currentVertex)) {
+                    if (!visitedVertices.contains(neighbor)) {
+                        stack.push(neighbor);
+                    }
+                }
+            }
+        }
+
+        return false;
+    }
+
     public GPath depthFirstSearch(V startVertex, V targetVertex) {
         if (startVertex == null || targetVertex == null) {
             return null;
@@ -205,35 +224,15 @@ public abstract class AbstractGraph<V> {
         Set<V> visitedVertices = new HashSet<>();
         GPath path = new GPath();
 
-        if (depthFirstSearchRecursive(startVertex, targetVertex, visitedVertices, path)) {
+        if (depthFirstSearchIterative(startVertex, targetVertex, visitedVertices, path)) {
             return path;
         } else {
             return null;
         }
     }
 
-    private boolean depthFirstSearchRecursive(V currentVertex, V targetVertex, Set<V> visitedVertices, GPath path) {
-        visitedVertices.add(currentVertex);
-        path.addVertex(currentVertex);
 
-        if (currentVertex.equals(targetVertex)) {
-            path.visited.addAll(visitedVertices);
-            return true;
-        }
 
-        for (V neighbor : getNeighbours(currentVertex)) {
-            if (!visitedVertices.contains(neighbor)) {
-                if (depthFirstSearchRecursive(neighbor, targetVertex, visitedVertices, path)) {
-                    return true;
-                }
-            }
-        }
-
-        // Backtrack if the target is not reached from this path
-        visitedVertices.remove(currentVertex);
-        path.removeLastVertex();
-        return false;
-    }
 
 
 
@@ -331,7 +330,7 @@ public abstract class AbstractGraph<V> {
      *          or null if target cannot be matched with a vertex in the sub-graph from startVertex
      */
     public GPath dijkstraShortestPath(V startVertex, V targetVertex,
-                                         BiFunction<V,V,Double> weightMapper) {
+                                      BiFunction<V,V,Double> weightMapper) {
 
         if (startVertex == null || targetVertex == null) return null;
 
